@@ -1,4 +1,4 @@
-| 🌐 [English](README.md) | [বাংলা](README.bn.md) |
+| 🌐 **English** | [বাংলা](README.bn.md) |
 |---|---|
 
 # luci-app-easymesh
