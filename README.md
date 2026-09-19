@@ -1,3 +1,5 @@
+**English** · [বাংলা](README.bn.md)
+
 # luci-app-easymesh
 
 An EasyMesh plugin for OpenWrt/ImmortalWrt — a lightweight LuCI interface that simplifies deploying Batman-adv layer-2 mesh networks with 802.11s wireless and wired backhaul. It can also be used standalone without a hotspot or VPN.
