@@ -37,13 +37,13 @@ OpenWrt/ImmortalWrt-এর জন্য একটি EasyMesh প্লাগই
 
 **ড্যাশবোর্ড** — লাইভ সঙ্গী, তারযুক্ত ব্যাকহল অবস্থা, সংযোগ অগ্রাধিকার:
 
-![EasyMesh dashboard](docs/screenshots/01-dashboard.png)
+![EasyMesh dashboard](../screenshots/01-dashboard.png)
 
 **দ্রুত সেটআপ প্রিসেট** — একটি ভূমিকা বাছাই করুন, একটি বোতাম ক্লিক করুন, সম্পন্ন:
 
-![Quick Setup presets 1-9](docs/screenshots/02-quick-setup-1-9.png)
+![Quick Setup presets 1-9](../screenshots/02-quick-setup-1-9.png)
 
-![Quick Setup presets 10-19](docs/screenshots/03-quick-setup-10-19.png)
+![Quick Setup presets 10-19](../screenshots/03-quick-setup-10-19.png)
 
 ---
 
@@ -345,15 +345,15 @@ rm -f /tmp/luci-indexcache /tmp/luci-modulecache/*
 
 ### সার্ভার পেজ কেমন দেখায়
 
-![Mesh settings](docs/screenshots/04-mesh-settings.png)
+![Mesh settings](../screenshots/04-mesh-settings.png)
 
 ### ক্লায়েন্ট + AP মোড পেজ কেমন দেখায়
 
-![Client WiFi + AP Mode](docs/screenshots/05-client-wifi-ap-mode.png)
+![Client WiFi + AP Mode](../screenshots/05-client-wifi-ap-mode.png)
 
 উভয়েই Save & Apply করার পর প্রায় ৩০ সেকেন্ড অপেক্ষা করুন। সার্ভারে **Network → EasyMesh** খুলুন — আপনার সঙ্গী টেবিলে ক্লায়েন্টের MAC দেখা উচিত:
 
-![EasyMesh dashboard](docs/screenshots/01-dashboard.png)
+![EasyMesh dashboard](../screenshots/01-dashboard.png)
 
 ---
 
@@ -365,7 +365,7 @@ rm -f /tmp/luci-indexcache /tmp/luci-modulecache/*
 1. OpenWrt-এ (**Network → Wireless**) যেকোনো সক্রিয় বেতার নেটওয়ার্ক নিষ্ক্রিয়/মুছুন।
 2. **Network → EasyMesh**-এ যান এবং Mesh Mode-এর জন্য **"Server"** নির্বাচন করুন।
 
-   ![Mesh settings](docs/screenshots/04-mesh-settings.png)
+   ![Mesh settings](../screenshots/04-mesh-settings.png)
 
 3. আপনার WiFi SSID লিখুন (এটি মূল WiFi নেটওয়ার্ক যা সমস্ত ডিভাইস সংযুক্ত হবে)।
 4. নিয়মিত AP-এর জন্য WiFi রেডিও নির্বাচন করুন। (সুপারিশ: সেরা পারফরম্যান্সের জন্য মেশ ব্যাকহল থেকে ভিন্ন রেডিও ব্যবহার করুন।)
@@ -387,7 +387,7 @@ rm -f /tmp/luci-indexcache /tmp/luci-modulecache/*
 5. **Save & Apply** ক্লিক করুন, তারপর **"Reapply EasyMesh Settings"** ক্লিক করুন।
 6. **AP Mode** ট্যাবে যান এবং একটি হোস্টনেম নির্বাচন করুন (যেমন `node2`, `node3`)।
 
-   ![Client WiFi + AP Mode](docs/screenshots/05-client-wifi-ap-mode.png)
+   ![Client WiFi + AP Mode](../screenshots/05-client-wifi-ap-mode.png)
 
 7. **DHCP** (Dumb AP নোডের জন্য সুপারিশকৃত) সেট করুন অথবা আপনার Mesh Server-এর মতো একই রেঞ্জে একটি Static IP কনফিগার করুন।
 8. **Save & Apply** ক্লিক করুন, তারপর **"Enable Dumb AP Mode"** ক্লিক করুন।
@@ -401,7 +401,7 @@ rm -f /tmp/luci-indexcache /tmp/luci-modulecache/*
 
 - Mesh Server-এ **Network → EasyMesh** এ যান এবং কাছাকাছি নোডগুলি **Mesh Status** এর অধীনে তালিকাভুক্ত কিনা দেখুন।
 
-  ![EasyMesh dashboard](docs/screenshots/01-dashboard.png)
+  ![EasyMesh dashboard](../screenshots/01-dashboard.png)
 
 - **Network → Wireless** এ যান এবং Mesh Backhaul নেটওয়ার্কগুলি সার্ভারের সাথে যোগাযোগ করছে কিনা যাচাই করুন।
 - **Status → Overview → DHCP Devices** এর অধীনে আপনার Mesh নোডগুলির IP খুঁজুন।
@@ -452,7 +452,7 @@ rm -f /tmp/luci-indexcache /tmp/luci-modulecache/*
 
 **EasyMesh-এর Mesh VLAN বৈশিষ্ট্য তিনটি নেটওয়ার্ককেই মেশ জুড়ে ছড়িয়ে দেয়** — যাতে একটি এক্সটেন্ডার নোডে একজন অতিথি এখনও অতিথি থাকে, এবং একটি এক্সটেন্ডারে একটি IoT ডিভাইস এখনও বিচ্ছিন্ন IoT নেটওয়ার্কে থাকে।
 
-![Link priority weights + Mesh VLANs](docs/screenshots/07-priority-vlans.png)
+![Link priority weights + Mesh VLANs](../screenshots/07-priority-vlans.png)
 
 ### আপনার কি এটি প্রয়োজন?
 
@@ -688,7 +688,7 @@ uci show network | grep 8021q   # কিছুই প্রিন্ট কর�
 
 Batman-adv `throughput_override` দ্বারা সংযোগ গুণমান গুণ করে সেরা পথ বেছে নেয়। EasyMesh UI-তে এই মানগুলি প্রকাশ করে:
 
-![Link priority weights](docs/screenshots/07-priority-vlans.png)
+![Link priority weights](../screenshots/07-priority-vlans.png)
 
 **ডিফল্ট:**
 
@@ -712,7 +712,7 @@ Batman-adv `throughput_override` দ্বারা সংযোগ গুণম
 
 মেশ টেবিলে **Priority weight** কলামটি প্রতিটি ইন্টারফেসে প্রয়োগ করা প্রকৃত `throughput_override` দেখায়, প্রতিটি পেজ লোডে রিফ্রেশ হয়:
 
-![EasyMesh dashboard](docs/screenshots/01-dashboard.png)
+![EasyMesh dashboard](../screenshots/01-dashboard.png)
 
 **প্রয়োগ করুন:**
 
@@ -788,7 +788,7 @@ batctl hardif eth0 throughput_override   # 1000.0 MBit দেখানো উচ
 
 অথবা **Network → EasyMesh → Boot-time reliability**-এ **Cron fallback** চেকবক্স সক্রিয় করুন:
 
-![Boot-time reliability](docs/screenshots/01-dashboard.png)
+![Boot-time reliability](../screenshots/01-dashboard.png)
 
 এটি প্রতি মিনিটে অগ্রাধিকার পুনঃপ্রয়োগ করে — নিরাপদ, idempotent, এবং রাউটারে যেখানে বেতার ড্রাইভার ধীরে লোড হয় সেখানে সহায়ক।
 
