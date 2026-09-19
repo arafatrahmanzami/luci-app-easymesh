@@ -1,12 +1,6 @@
 -- Copyright (C) 2021 dz <dingzhong110@gmail.com>
 -- Copyright (C) 2026 Arafat Rahman Zami Mondol <zamimondol@gmail.com>
--- v2.7 — cron toggle + latency/bandwidth monitoring
---
--- Modified from the original EasyMesh LuCI app.
--- Original fork:  mobing8/luci-app-easymesh-dawn
--- Upstream:       kenzok78/luci-app-easymesh
--- Additions:      cron toggle UI, latency/bandwidth monitoring,
---                 wired backhaul neighbor/last-seen, robust priority read
+-- v2.8 — wired+wireless priority display, editable priority weights, mesh VLANs
 
 local m, s, o
 local sys = require "luci.sys"
@@ -97,7 +91,6 @@ end
 
 local function batman_ping(mac)
     if not mac or mac == "" then return "—" end
-    -- 3 pings, 200ms apart, 1s timeout each — take the min
     local fp = io.popen("batctl ping -c 3 -i 0.2 -t 1 " .. mac .. " 2>/dev/null")
     if not fp then return "—" end
     local min_ms = nil
@@ -112,7 +105,6 @@ local function batman_ping(mac)
     if not min_ms then return "—" end
     return string.format("%.1f ms", min_ms)
 end
-
 
 local function read_override(iface)
     -- Try multiple batctl syntaxes — first one that returns a digit wins
@@ -134,9 +126,8 @@ local function read_override(iface)
     return "?"
 end
 
-
 -- =========================================================
--- Active hardifs + live bandwidth sampling (1-second window)
+-- Active hardifs + live bandwidth sampling (1s window)
 -- =========================================================
 local active_ifaces = {}
 local afl = io.popen("batctl if 2>/dev/null")
@@ -190,7 +181,7 @@ end
 local originators = parse_originators()
 
 -- =========================================================
--- Wireless peers table
+-- Wireless peers table (with Priority column)
 -- =========================================================
 local function detect_nodes()
     local data = {}
@@ -229,19 +220,21 @@ end
 
 local peers = detect_nodes()
 for _, p in ipairs(peers) do
-    p.Latency = batman_ping(p.Neighbor)
+    p.Latency  = batman_ping(p.Neighbor)
+    p.Priority = read_override(p.IF)
     local r = rates[p.IF]
     if r then p.BW_RX = r.rx; p.BW_TX = r.tx
     else p.BW_RX = "—"; p.BW_TX = "—" end
 end
 
 local v = m:section(Table, peers, "", "<b>" .. status_line .. "</b>")
-v:option(DummyValue, "IF", translate("Interface"))
+v:option(DummyValue, "IF",       translate("Interface"))
 v:option(DummyValue, "Neighbor", translate("Neighbor MAC"))
 v:option(DummyValue, "lastseen", translate("Last seen"))
-v:option(DummyValue, "Latency", translate("Latency"))
-v:option(DummyValue, "BW_RX", translate("RX rate"))
-v:option(DummyValue, "BW_TX", translate("TX rate"))
+v:option(DummyValue, "Latency",  translate("Latency"))
+v:option(DummyValue, "BW_RX",    translate("RX rate"))
+v:option(DummyValue, "BW_TX",    translate("TX rate"))
+v:option(DummyValue, "Priority", translate("Priority weight"))
 
 -- =========================================================
 -- Wired backhaul details
@@ -271,7 +264,6 @@ local function detect_wired_details()
             local bf = io.open("/sys/class/net/" .. iface .. "/brport/bridge", "r")
             if bf then bf:close(); bridged = "yes" end
 
-            -- Neighbor MAC + last-seen from originator table
             local entries = originators[iface] or {}
             local best = nil
             for _, e in ipairs(entries) do
@@ -281,7 +273,6 @@ local function detect_wired_details()
             local neighbor = best and best.mac or "—"
             local lastseen = best and best.seen or "—"
 
-            -- Latency via batman ping to the neighbor MAC
             local latency = batman_ping(neighbor)
 
             local r = rates[iface]
@@ -301,17 +292,17 @@ local wired_rows = detect_wired_details()
 if #wired_rows > 0 then
     local wv = m:section(Table, wired_rows,
         "<b>" .. translate("Wired backhaul details") .. "</b>")
-    wv:option(DummyValue, "IF", translate("Interface"))
-    wv:option(DummyValue, "State", translate("State"))
-    wv:option(DummyValue, "Cable", translate("Cable"))
-    wv:option(DummyValue, "Speed", translate("Link speed"))
+    wv:option(DummyValue, "IF",       translate("Interface"))
+    wv:option(DummyValue, "State",    translate("State"))
+    wv:option(DummyValue, "Cable",    translate("Cable"))
+    wv:option(DummyValue, "Speed",    translate("Link speed"))
     wv:option(DummyValue, "Neighbor", translate("Neighbor MAC"))
     wv:option(DummyValue, "Lastseen", translate("Last seen"))
-    wv:option(DummyValue, "Latency", translate("Latency"))
-    wv:option(DummyValue, "BW_RX", translate("RX rate"))
-    wv:option(DummyValue, "BW_TX", translate("TX rate"))
+    wv:option(DummyValue, "Latency",  translate("Latency"))
+    wv:option(DummyValue, "BW_RX",    translate("RX rate"))
+    wv:option(DummyValue, "BW_TX",    translate("TX rate"))
     wv:option(DummyValue, "Override", translate("Priority weight"))
-    wv:option(DummyValue, "Bridged", translate("In LAN bridge"))
+    wv:option(DummyValue, "Bridged",  translate("In LAN bridge"))
 end
 
 -- =========================================================
@@ -347,6 +338,59 @@ o.default = "0"
 o.rmempty = false
 
 -- =========================================================
+-- Link priority weights (editable)
+-- =========================================================
+local lp = m:section(TypedSection, "easymesh",
+    translate("Link priority weights"),
+    translate("Batman-adv throughput_override values in Kbit/s. " ..
+              "Higher = preferred. Set to 0 to let batman auto-decide per link. " ..
+              "Defaults: wired=1000000, 6G=900000, 5G=600000, 2.4G=30000. " ..
+              "Changes apply on next Save & Apply (or 'Reapply EasyMesh Settings')."))
+lp.anonymous = true
+
+o = lp:option(Value, "priority_wired", translate("Wired (Kbit/s)"))
+o.default = "1000000"
+o.datatype = "uinteger"
+o.rmempty = false
+
+o = lp:option(Value, "priority_6g", translate("6 GHz wireless (Kbit/s)"))
+o.default = "900000"
+o.datatype = "uinteger"
+o.rmempty = false
+
+o = lp:option(Value, "priority_5g", translate("5 GHz wireless (Kbit/s)"))
+o.default = "600000"
+o.datatype = "uinteger"
+o.rmempty = false
+
+o = lp:option(Value, "priority_24g", translate("2.4 GHz wireless (Kbit/s)"))
+o.default = "30000"
+o.datatype = "uinteger"
+o.rmempty = false
+
+-- =========================================================
+-- Mesh VLANs (extend guest/IoT/hotspot over mesh)
+-- =========================================================
+local mv = m:section(TypedSection, "easymesh",
+    translate("Mesh VLANs"),
+    translate("Extend guest / IoT / hotspot networks across the mesh. " ..
+              "Enter a comma-separated list of VLAN IDs (e.g. 10,20,30). " ..
+              "The init script creates bat0.<vid> as an 8021q device for each ID. " ..
+              "If a bridge named br-<vid>, br-lan<vid>, br-vlan<vid>, br-guest<vid>, " ..
+              "or br-iot<vid> already exists, it is auto-added to that bridge. " ..
+              "Otherwise, add the bat0.<vid> device manually in " ..
+              "Network → Interfaces → Devices. " ..
+              "Requires 802.1Q-capable switches on the physical wired backhaul."))
+mv.anonymous = true
+
+o = mv:option(Value, "mesh_vlans",
+    translate("VLAN IDs (comma-separated)"),
+    translate("Example: 10,20,30 — Leave empty to disable"))
+o.default = ""
+o.datatype = "maxlength(200)"
+o.rmempty = false
+
+-- =========================================================
 -- QUICK SETUP — 19 presets
 -- =========================================================
 local q = m:section(TypedSection, "easymesh", translate("Quick Setup"),
@@ -356,7 +400,6 @@ local q = m:section(TypedSection, "easymesh", translate("Quick Setup"),
 q.anonymous = true
 
 local presets = {
-    -- ================= SERVER =================
     { id = "srv_5g", values = { enabled="1", role="server", band_mode="single_5g", encryption="0", kvr="1", ap_mode="0", ap_enabled_2g="1", ap_enabled_5g="1", ap_network="lan", wired_if="" }, label = translate("1. Server — 5 GHz wireless only"), desc = translate("[SERVER] Gateway. Extenders join via 5 GHz mesh only.") },
     { id = "srv_2g", values = { enabled="1", role="server", band_mode="single_2g", encryption="0", kvr="1", ap_mode="0", ap_enabled_2g="1", ap_enabled_5g="1", ap_network="lan", wired_if="" }, label = translate("2. Server — 2.4 GHz wireless only"), desc = translate("[SERVER] Extenders join via 2.4 GHz (longer range).") },
     { id = "srv_dual", values = { enabled="1", role="server", band_mode="dual", encryption="0", kvr="1", ap_mode="0", ap_enabled_2g="1", ap_enabled_5g="1", ap_network="lan", wired_if="" }, label = translate("3. Server — Dual-band wireless only"), desc = translate("[SERVER] Both radios carry backhaul.") },
@@ -365,7 +408,6 @@ local presets = {
     { id = "srv_2g_wired", values = { enabled="1", role="server", band_mode="single_2g_wired", encryption="0", kvr="1", ap_mode="0", ap_enabled_2g="1", ap_enabled_5g="1", ap_network="lan", wired_if="AUTO_DETECT" }, label = translate("6. Server — 2.4 GHz + Wired"), desc = translate("[SERVER] 2.4 GHz mesh plus Ethernet.") },
     { id = "srv_dual_wired", values = { enabled="1", role="server", band_mode="dual_wired", encryption="0", kvr="1", ap_mode="0", ap_enabled_2g="1", ap_enabled_5g="1", ap_network="lan", wired_if="AUTO_DETECT" }, label = translate("7. Server — Dual-band + Wired"), desc = translate("[SERVER] Maximum redundancy. Both radios + Ethernet.") },
 
-    -- ================= CLIENT =================
     { id = "cli_5g", values = { enabled="1", role="client", band_mode="single_5g", encryption="0", kvr="1", ap_mode="1", ip_mode="dhcp", ap_enabled_2g="1", ap_enabled_5g="1", ap_network="lan", wired_if="" }, label = translate("8. Client — 5 GHz wireless only"), desc = translate("[CLIENT] Extender via 5 GHz. No cable.") },
     { id = "cli_2g", values = { enabled="1", role="client", band_mode="single_2g", encryption="0", kvr="1", ap_mode="1", ip_mode="dhcp", ap_enabled_2g="1", ap_enabled_5g="1", ap_network="lan", wired_if="" }, label = translate("9. Client — 2.4 GHz wireless only"), desc = translate("[CLIENT] Extender via 2.4 GHz.") },
     { id = "cli_dual", values = { enabled="1", role="client", band_mode="dual", encryption="0", kvr="1", ap_mode="1", ip_mode="dhcp", ap_enabled_2g="1", ap_enabled_5g="1", ap_network="lan", wired_if="" }, label = translate("10. Client — Dual-band wireless only"), desc = translate("[CLIENT] Extender via both radios.") },
@@ -374,12 +416,10 @@ local presets = {
     { id = "cli_2g_wired", values = { enabled="1", role="client", band_mode="single_2g_wired", encryption="0", kvr="1", ap_mode="1", ip_mode="dhcp", ap_enabled_2g="1", ap_enabled_5g="1", ap_network="lan", wired_if="AUTO_DETECT" }, label = translate("13. Client — 2.4 GHz + Wired fallback"), desc = translate("[CLIENT] 2.4 GHz primary, Ethernet fallback.") },
     { id = "cli_dual_wired", values = { enabled="1", role="client", band_mode="dual_wired", encryption="0", kvr="1", ap_mode="1", ip_mode="dhcp", ap_enabled_2g="1", ap_enabled_5g="1", ap_network="lan", wired_if="AUTO_DETECT" }, label = translate("14. Client — Dual-band + Wired fallback"), desc = translate("[CLIENT] Both radios + Ethernet. Maximum redundancy.") },
 
-    -- ================= NODE =================
     { id = "node_5g", values = { enabled="1", role="node", band_mode="single_5g", encryption="0", kvr="1", ap_mode="0", ap_enabled_2g="0", ap_enabled_5g="0", wired_if="" }, label = translate("15. Node — 5 GHz relay"), desc = translate("[NODE] Relay only, 5 GHz. No client SSID.") },
     { id = "node_dual", values = { enabled="1", role="node", band_mode="dual", encryption="0", kvr="1", ap_mode="0", ap_enabled_2g="0", ap_enabled_5g="0", wired_if="" }, label = translate("16. Node — Dual-band relay"), desc = translate("[NODE] Relay only, both radios.") },
     { id = "node_wired", values = { enabled="1", role="node", band_mode="none", encryption="0", kvr="1", ap_mode="0", ap_enabled_2g="0", ap_enabled_5g="0", wired_if="AUTO_DETECT" }, label = translate("17. Node — Wired relay only"), desc = translate("[NODE] Relay via cable only. No wireless.") },
 
-    -- ================= UTILITIES =================
     { id = "revert_wired", values = {}, custom = "detach_wired", label = translate("18. Detach wired backhaul"), desc = translate("Removes Ethernet backhaul, restores port to bridge.") },
     { id = "disable", values = { enabled="0" }, label = translate("19. Disable mesh"), desc = translate("Turns off mesh. Radios stay enabled.") },
 }
@@ -460,6 +500,7 @@ uci:foreach("wireless", "wifi-device", function(sect)
     local label = name .. " ("
     if band == "2g" then label = label .. "2.4 GHz"
     elseif band == "5g" then label = label .. "5 GHz"
+    elseif band == "6g" then label = label .. "6 GHz"
     else label = label .. band end
     apRadio:value(name, label .. ")")
 end)

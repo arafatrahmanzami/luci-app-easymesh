@@ -286,6 +286,19 @@ load_config() {
     : "${AP_ENCRYPTION_2G:=sae-mixed}"
     : "${AP_ENCRYPTION_5G:=sae-mixed}"
     : "${AP_NETWORK:=lan}"
+
+    # Priority weights (Kbit/s) + mesh VLANs
+    PRIORITY_WIRED=$(uci -q get easymesh.config.priority_wired)
+    PRIORITY_6G=$(uci -q get easymesh.config.priority_6g)
+    PRIORITY_5G=$(uci -q get easymesh.config.priority_5g)
+    PRIORITY_24G=$(uci -q get easymesh.config.priority_24g)
+    MESH_VLANS=$(uci -q get easymesh.config.mesh_vlans)
+
+    : "${PRIORITY_WIRED:=1000000}"
+    : "${PRIORITY_6G:=900000}"
+    : "${PRIORITY_5G:=600000}"
+    : "${PRIORITY_24G:=30000}"
+    : "${MESH_VLANS:=}"
 }
 
 # =========================================================
@@ -561,11 +574,68 @@ setup_wired() {
     log "Wired backhaul: $WIRED_IF"
 }
 
+
+# =========================================================
+# Mesh VLANs — extend guest/IoT over mesh via 802.1Q
+# =========================================================
+setup_mesh_vlans() {
+    # Remove any previous 8021q devices on bat0
+    local idx=0 name typ ifn
+    while name=$(uci -q get "network.@device[$idx].name"); do
+        typ=$(uci -q get "network.@device[$idx].type")
+        ifn=$(uci -q get "network.@device[$idx].ifname")
+        if [ "$typ" = "8021q" ] && [ "$ifn" = "bat0" ]; then
+            uci -q delete "network.@device[$idx]"
+            continue
+        fi
+        idx=$((idx + 1))
+    done
+
+    if [ -z "$MESH_VLANS" ]; then
+        uci commit network
+        return 0
+    fi
+
+    local vlan br_name
+    for vlan in $(echo "$MESH_VLANS" | tr ',' ' '); do
+        vlan=$(echo "$vlan" | tr -d ' ')
+        case "$vlan" in
+            ''|*[!0-9]*) log "Skipping invalid VLAN: $vlan"; continue ;;
+        esac
+
+        # Create bat0.<vid> as 802.1q device
+        uci add network device >/dev/null
+        uci set "network.@device[-1].name=bat0.$vlan"
+        uci set "network.@device[-1].type=8021q"
+        uci set "network.@device[-1].ifname=bat0"
+        uci set "network.@device[-1].vid=$vlan"
+        log "Mesh VLAN: bat0.$vlan created"
+
+        # Auto-add to matching bridge if it exists
+        for br_name in "br-$vlan" "br-lan$vlan" "br-vlan$vlan" "br-guest$vlan" "br-iot$vlan"; do
+            local bi=0 bn
+            while bn=$(uci -q get "network.@device[$bi].name"); do
+                if [ "$bn" = "$br_name" ]; then
+                    uci -q get "network.@device[$bi].ports" | grep -q "bat0.$vlan" || \
+                        uci add_list "network.@device[$bi].ports=bat0.$vlan"
+                    log "Mesh VLAN $vlan: attached to $br_name"
+                    bi=-1
+                    break
+                fi
+                bi=$((bi + 1))
+            done
+            [ "$bi" = "-1" ] && break
+        done
+    done
+
+    uci commit network
+}
+
+
 # =========================================================
 # Link priority (throughput_override in Kbit/s)
 # =========================================================
 apply_link_priority() {
-    # Wait up to 90s for at least one active hardif
     local tries=0
     local active=0
     while [ $tries -lt 45 ]; do
@@ -583,13 +653,13 @@ apply_link_priority() {
 
     sleep 2
 
-    # Wired hardifs — 1 Gbit
+    # Wired hardifs
     local iface
     for iface in $(batctl if 2>/dev/null | awk -F: '/active/ {print $1}'); do
         case "$iface" in
             eth*|lan*)
-                batctl hardif "$iface" throughput_override 1000000 2>/dev/null
-                log "Link priority: $iface = 1000000 Kbit (wired)"
+                batctl hardif "$iface" throughput_override "$PRIORITY_WIRED" 2>/dev/null
+                log "Link priority: $iface = $PRIORITY_WIRED Kbit (wired)"
                 ;;
         esac
     done
@@ -603,14 +673,14 @@ apply_link_priority() {
                 [ -z "$freq" ] && continue
 
                 if [ "$freq" -lt 2500 ]; then
-                    batctl hardif "$iface" throughput_override 30000 2>/dev/null
-                    log "Link priority: $iface = 30000 Kbit (2.4 GHz, $freq MHz)"
+                    batctl hardif "$iface" throughput_override "$PRIORITY_24G" 2>/dev/null
+                    log "Link priority: $iface = $PRIORITY_24G Kbit (2.4 GHz, $freq MHz)"
                 elif [ "$freq" -lt 6000 ]; then
-                    batctl hardif "$iface" throughput_override 600000 2>/dev/null
-                    log "Link priority: $iface = 600000 Kbit (5 GHz, $freq MHz)"
+                    batctl hardif "$iface" throughput_override "$PRIORITY_5G" 2>/dev/null
+                    log "Link priority: $iface = $PRIORITY_5G Kbit (5 GHz, $freq MHz)"
                 else
-                    batctl hardif "$iface" throughput_override 900000 2>/dev/null
-                    log "Link priority: $iface = 900000 Kbit (6 GHz, $freq MHz)"
+                    batctl hardif "$iface" throughput_override "$PRIORITY_6G" 2>/dev/null
+                    log "Link priority: $iface = $PRIORITY_6G Kbit (6 GHz, $freq MHz)"
                 fi
                 ;;
         esac
@@ -693,6 +763,7 @@ enable_mesh() {
     esac
 
     setup_wired
+    setup_mesh_vlans
     apply_kvr
     apply_client_ap
     apply_ap_mode

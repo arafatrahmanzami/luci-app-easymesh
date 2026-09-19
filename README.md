@@ -4,7 +4,7 @@
 
 An EasyMesh plugin for OpenWrt/ImmortalWrt — a lightweight LuCI interface that simplifies deploying Batman-adv layer-2 mesh networks with 802.11s wireless and wired backhaul. It can also be used standalone without a hotspot or VPN.
 
-**Release:** `2.4.1-r1` — 2026-09-16 — commit `6adfab5` — by [@arafatrahmanzami](https://github.com/arafatrahmanzami)
+**Release:** `2.4.1-r1` — 2026-09-16 — by [@arafatrahmanzami](https://github.com/arafatrahmanzami)
 
 With limited skills, I wrote a mesh LuCI setup plugin based on `kmod-batman-adv` + 802.11s wired + wireless backhaul. The addition of quick and automatic settings makes setup more convenient. The plugin has only been tested on OpenWrt and ImmortalWrt 24 and 25. It's very poorly written but usable for now. Please report or resolve any issues with the available source code if needed.
 
