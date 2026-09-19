@@ -1,9 +1,5 @@
-<p align="center">
-  <a href="README.md"><img src="https://img.shields.io/badge/Language-English-2f81f7?style=for-the-badge" alt="English"></a>
-  <img src="https://img.shields.io/badge/%E0%A6%AD%E0%A6%BE%E0%A6%B7%E0%A6%BE-%E0%A6%AC%E0%A6%BE%E0%A6%82%E0%A6%B2%E0%A6%BE-006a4e?style=for-the-badge" alt="বাংলা">
-</p>
-
-# luci-app-easymesh
+| 🌐 [English](README.md) | **বাংলা** |
+|---|---|
 
 # luci-app-easymesh
 
