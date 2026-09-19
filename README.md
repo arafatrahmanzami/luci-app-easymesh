@@ -1,5 +1,4 @@
-| 🌐 **English** | [বাংলা](README.bn.md) |
-|---|---|
+🌐 **English** · [**বাংলা**](https://github.com/arafatrahmanzami/luci-app-easymesh/tree/main/docs/bn)
 
 # luci-app-easymesh
 
