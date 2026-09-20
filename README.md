@@ -45,8 +45,9 @@ It also lets you **connect the routers with Ethernet cables** for faster backhau
 - [Quick Start](#quick-start)
 - [Detailed Setup](#detailed-setup--basic-mesh-network-1-server--2-nodes)
 - [Working with Dumb AP / Client Nodes](#working-with-dumb-ap--client-nodes)
-- [Extending Guest / IoT Networks over the Mesh (VLANs)](#extending-guest--iot-networks-over-the-mesh-vlans)
 - [Tuning Link Priorities](#tuning-link-priorities)
+- [Wired Backhaul — Safety, Fallback & Actions](#wired-backhaul--safety-fallback--actions)
+- [Extending Guest / IoT Networks over the Mesh (VLANs)](#extending-guest--iot-networks-over-the-mesh-vlans)
 - [More Info — Use Case Scenarios](#more-info--use-case-scenarios)
 - [Troubleshooting](#troubleshooting)
 - [Changelog](#changelog)
@@ -437,6 +438,103 @@ If you cannot access the site via WiFi, connect the sub-node's LAN port directly
 
 ---
 
+## Tuning Link Priorities
+
+Batman-adv chooses the best path by multiplying link quality by `throughput_override`. EasyMesh exposes these values in the UI:
+
+**Defaults:**
+
+| Field | Default (Kbit/s) | Meaning |
+|---|---|---|
+| Wired | `1000000` | Prefer wired over any wireless |
+| 6 GHz | `900000` | Fast wireless, near-wired |
+| 5 GHz | `600000` | Standard 5 GHz backhaul |
+| 2.4 GHz | `30000` | Slow but long range |
+
+Higher value = more likely to be chosen. Set to `0` to let batman decide purely on link quality.
+
+**Typical tuning scenarios:**
+
+- **Wired-first, wireless-fallback (default):** wired=1000000, 5 GHz=600000, 2.4 GHz=30000
+- **Force wired only** (ignore wireless unless wired drops): wired=10000000, 5 GHz=100000, 2.4 GHz=10000
+- **Force 5 GHz primary** (prefer wireless bandwidth): wired=500000, 5 GHz=900000, 2.4 GHz=20000
+- **Long-range preference** (2.4 GHz better through walls): wired=1000000, 5 GHz=400000, 2.4 GHz=200000
+
+**Verify current values in real time:**
+
+The **Priority weight** column in the mesh tables shows the actual `throughput_override` applied to each interface, refreshed every page load. See the dashboard screenshot in [Quick Start](#quick-start).
+
+**Apply:**
+
+Click **Save & Apply**, or run:
+
+```sh
+/etc/init.d/easymesh restart
+```
+
+Changes take effect within ~15 seconds.
+
+---
+
+## Wired Backhaul — Safety, Fallback & Actions
+
+EasyMesh makes wired backhaul safe and automatic — plug in a cable between two nodes, and the mesh treats it as the primary path. If the cable fails, it falls back to wireless without manual intervention.
+
+![Wired backhaul safety — port status, priority state, fallback](docs/screenshots/06-wired-backhaul-safety.png)
+
+### Actions on apply
+
+- **Port filtering** — only physical `ethN` / `lanN` ports are selectable. CPU-internal ports and macvlan interfaces are hidden, so you can't accidentally break the router by picking the wrong interface.
+- **Automatic bridge removal** — the chosen port is removed from the LAN bridge (`br-lan`) on apply. This prevents a Layer-2 loop between the wired path and the mesh path.
+- **Priority assignment** — the port receives `throughput_override = 1000000` (1 Gbit), so batman-adv prefers it over any wireless link.
+- **Status labels** — before you commit, each port shows `(in bridge - will be removed on apply)` or `(free)` so you know exactly what will happen.
+
+### Fallback to wireless
+
+When the wired link drops (cable unplugged, switch reboots, port failure):
+
+- batman-adv detects the loss within a few seconds
+- Traffic automatically reroutes through the 5 GHz (600 Mbit priority) or 2.4 GHz (30 Mbit priority) mesh backhaul
+- No manual intervention needed
+
+When the cable comes back:
+
+- The wired port re-attaches automatically
+- Traffic switches back to wired — wired always wins while it's available
+
+### Security
+
+- **Loop prevention** — removing the wired port from the LAN bridge stops a Layer-2 loop between wired and mesh paths, which would otherwise flood the network.
+- **WPA3 on the wireless backhaul** — mesh links use WPA3 when configured; the wired side is a direct L2 link between trusted nodes only.
+- **Rollback watchdog** — if a wired-backhaul change breaks connectivity, a 60-second watchdog automatically restores the previous working configuration.
+
+### Quick checks
+
+Verify the wired backhaul is active:
+
+```sh
+batctl hardif eth0 throughput_override   # expect 1000.0 MBit
+batctl o                                 # wired neighbor at the top
+ip link show eth0                        # UP, no `master br-lan`
+```
+
+Confirm the port was removed from the bridge:
+
+```sh
+brctl show br-lan                        # eth0 should NOT be listed
+```
+
+Force a wireless fallback for testing:
+
+```sh
+ip link set eth0 down
+sleep 10
+batctl o                                 # traffic should now use 5 GHz
+ip link set eth0 up
+```
+
+---
+
 ## Extending Guest / IoT Networks over the Mesh (VLANs)
 
 ### What is this, in 30 seconds?
@@ -683,46 +781,6 @@ You don't need to understand this to use it, but it helps when debugging.
 
 ---
 
-## Tuning Link Priorities
-
-Batman-adv chooses the best path by multiplying link quality by `throughput_override`. EasyMesh exposes these values in the UI:
-
-![Wired backhaul safety + link priority state](docs/screenshots/06-wired-backhaul-safety.png)
-
-**Defaults:**
-
-| Field | Default (Kbit/s) | Meaning |
-|---|---|---|
-| Wired | `1000000` | Prefer wired over any wireless |
-| 6 GHz | `900000` | Fast wireless, near-wired |
-| 5 GHz | `600000` | Standard 5 GHz backhaul |
-| 2.4 GHz | `30000` | Slow but long range |
-
-Higher value = more likely to be chosen. Set to `0` to let batman decide purely on link quality.
-
-**Typical tuning scenarios:**
-
-- **Wired-first, wireless-fallback (default):** wired=1000000, 5 GHz=600000, 2.4 GHz=30000
-- **Force wired only** (ignore wireless unless wired drops): wired=10000000, 5 GHz=100000, 2.4 GHz=10000
-- **Force 5 GHz primary** (prefer wireless bandwidth): wired=500000, 5 GHz=900000, 2.4 GHz=20000
-- **Long-range preference** (2.4 GHz better through walls): wired=1000000, 5 GHz=400000, 2.4 GHz=200000
-
-**Verify current values in real time:**
-
-The **Priority weight** column in the mesh tables shows the actual `throughput_override` applied to each interface, refreshed every page load. See the dashboard screenshot in [Quick Start](#quick-start).
-
-**Apply:**
-
-Click **Save & Apply**, or run:
-
-```sh
-/etc/init.d/easymesh restart
-```
-
-Changes take effect within ~15 seconds.
-
----
-
 ## More Info — Use Case Scenarios
 
 1. **No VPN required.** You can completely and quickly build / deploy a standard mesh wired + wireless network using only OpenWrt/ImmortalWrt routers without a VPN — in seconds.
@@ -907,7 +965,7 @@ make package/luci-app-easymesh/compile V=s
   - [kenzok78/luci-app-easymesh](https://github.com/kenzok78/luci-app-easymesh)
   - [torguardvpn/luci-app-easymesh](https://github.com/torguardvpn/luci-app-easymesh)
 - **Bugfix branch:** [mobing8/luci-app-easymesh-dawn](https://github.com/mobing8/luci-app-easymesh-dawn)
-- **Current maintainer:** Arafat Rahman Zami Mondol <zamimondol@gmail.com>
+- **Current maintainer:** Arafat Rahman Zami Mondol — [@arafatrahmanzami](https://github.com/arafatrahmanzami) · [open an issue](https://github.com/arafatrahmanzami/luci-app-easymesh/issues/new)
 
 For further exploration, check the source code or track releases on the reference repositories listed above.
 
