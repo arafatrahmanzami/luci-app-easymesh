@@ -438,49 +438,13 @@ If you cannot access the site via WiFi, connect the sub-node's LAN port directly
 
 ---
 
-## Tuning Link Priorities
-
-Batman-adv chooses the best path by multiplying link quality by `throughput_override`. EasyMesh exposes these values in the UI:
-
-**Defaults:**
-
-| Field | Default (Kbit/s) | Meaning |
-|---|---|---|
-| Wired | `1000000` | Prefer wired over any wireless |
-| 6 GHz | `900000` | Fast wireless, near-wired |
-| 5 GHz | `600000` | Standard 5 GHz backhaul |
-| 2.4 GHz | `30000` | Slow but long range |
-
-Higher value = more likely to be chosen. Set to `0` to let batman decide purely on link quality.
-
-**Typical tuning scenarios:**
-
-- **Wired-first, wireless-fallback (default):** wired=1000000, 5 GHz=600000, 2.4 GHz=30000
-- **Force wired only** (ignore wireless unless wired drops): wired=10000000, 5 GHz=100000, 2.4 GHz=10000
-- **Force 5 GHz primary** (prefer wireless bandwidth): wired=500000, 5 GHz=900000, 2.4 GHz=20000
-- **Long-range preference** (2.4 GHz better through walls): wired=1000000, 5 GHz=400000, 2.4 GHz=200000
-
-**Verify current values in real time:**
-
-The **Priority weight** column in the mesh tables shows the actual `throughput_override` applied to each interface, refreshed every page load. See the dashboard screenshot in [Quick Start](#quick-start).
-
-**Apply:**
-
-Click **Save & Apply**, or run:
-
-```sh
-/etc/init.d/easymesh restart
-```
-
-Changes take effect within ~15 seconds.
-
----
+![Wired Backhaul — Safety, Fallback & Actions](docs/screenshots/06-wired-backhaul-safety.png)
 
 ## Wired Backhaul — Safety, Fallback & Actions
 
 EasyMesh makes wired backhaul safe and automatic — plug in a cable between two nodes, and the mesh treats it as the primary path. If the cable fails, it falls back to wireless without manual intervention.
 
-![Wired backhaul safety — port status, priority state, fallback](docs/screenshots/06-wired-backhaul-safety.png)
+
 
 ### Actions on apply
 
@@ -535,6 +499,49 @@ ip link set eth0 up
 
 ---
 
+## Tuning Link Priorities
+
+Batman-adv chooses the best path by multiplying link quality by `throughput_override`. EasyMesh exposes these values in the UI:
+
+**Defaults:**
+
+| Field | Default (Kbit/s) | Meaning |
+|---|---|---|
+| Wired | `1000000` | Prefer wired over any wireless |
+| 6 GHz | `900000` | Fast wireless, near-wired |
+| 5 GHz | `600000` | Standard 5 GHz backhaul |
+| 2.4 GHz | `30000` | Slow but long range |
+
+Higher value = more likely to be chosen. Set to `0` to let batman decide purely on link quality.
+
+**Typical tuning scenarios:**
+
+- **Wired-first, wireless-fallback (default):** wired=1000000, 5 GHz=600000, 2.4 GHz=30000
+- **Force wired only** (ignore wireless unless wired drops): wired=10000000, 5 GHz=100000, 2.4 GHz=10000
+- **Force 5 GHz primary** (prefer wireless bandwidth): wired=500000, 5 GHz=900000, 2.4 GHz=20000
+- **Long-range preference** (2.4 GHz better through walls): wired=1000000, 5 GHz=400000, 2.4 GHz=200000
+
+**Verify current values in real time:**
+
+The **Priority weight** column in the mesh tables shows the actual `throughput_override` applied to each interface, refreshed every page load. See the dashboard screenshot in [Quick Start](#quick-start).
+
+**Apply:**
+
+Click **Save & Apply**, or run:
+
+```sh
+/etc/init.d/easymesh restart
+```
+
+Changes take effect within ~15 seconds.
+
+---
+
+
+![Link priority weights + Mesh VLANs](docs/screenshots/07-priority-vlans.png)
+
+---
+
 ## Extending Guest / IoT Networks over the Mesh (VLANs)
 
 ### What is this, in 30 seconds?
@@ -549,7 +556,7 @@ Normally, when you add a mesh extender, only the **main network** spreads to the
 
 **EasyMesh's Mesh VLANs** (Virtual LANs) feature lets all three networks spread across the mesh — so a Guest on an extender node is still a Guest, and an IoT device on an extender is still on the isolated IoT network.
 
-![Link priority weights + Mesh VLANs](docs/screenshots/07-priority-vlans.png)
+
 
 ### Do you need this?
 
