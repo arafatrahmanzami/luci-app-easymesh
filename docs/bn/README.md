@@ -2,7 +2,7 @@
 
 # luci-app-easymesh
 
-OpenWrt/ImmortalWrt-এর জন্য একটি EasyMesh প্লাগইন — একটি হালকা LuCI ইন্টারফেস যা 802.11s বেতার এবং তারযুক্ত ব্যাকহলের সাথে Batman-adv লেয়ার-২ মেশ নেটওয়ার্ক স্থাপনকে সহজ করে। এটি হটস্পট বা VPN ছাড়াই স্বতন্ত্রভাবে ব্যবহার করা যায়।
+OpenWrt/ImmortalWrt-এর জন্য একটি EasyMesh প্লাগইন — একটি হালকা LuCI (OpenWrt-এর ওয়েব-ভিত্তিক কনফিগারেশন ইন্টারফেস) যা 802.11s (IEEE বেতার মেশ মান) বেতার এবং তারযুক্ত ব্যাকহলের সাথে Batman-adv লেয়ার-২ মেশ নেটওয়ার্ক স্থাপনকে সহজ করে। এটি হটস্পট বা VPN (Virtual Private Network) ছাড়াই স্বতন্ত্রভাবে ব্যবহার করা যায়।
 
 **প্রকাশ:** `2.4.1-r1` — ২০২৬-০৯-১৬ — [@arafatrahmanzami](https://github.com/arafatrahmanzami) কর্তৃক
 
@@ -30,20 +30,6 @@ OpenWrt/ImmortalWrt-এর জন্য একটি EasyMesh প্লাগই
 - ❌ আপনার শুধুমাত্র একটি রাউটার আছে
 - ❌ আপনি কাস্টম ফার্মওয়্যার ইনস্টল করতে চান না
 - ❌ আপনি প্রতি রাউটারে আলাদা WiFi নামে সন্তুষ্ট
-
----
-
-## পূর্বরূপ
-
-**ড্যাশবোর্ড** — লাইভ সঙ্গী, তারযুক্ত ব্যাকহল অবস্থা, সংযোগ অগ্রাধিকার:
-
-![EasyMesh dashboard](../screenshots-bn/01-dashboard_bn.png)
-
-**দ্রুত সেটআপ প্রিসেট** — একটি ভূমিকা বাছাই করুন, একটি বোতাম ক্লিক করুন, সম্পন্ন:
-
-![Quick Setup presets 1-9](../screenshots-bn/02-quick-setup-1-9_bn.png)
-
-![Quick Setup presets 10-19](../screenshots-bn/03-quick-setup-10-19_bn.png)
 
 ---
 
@@ -91,7 +77,7 @@ OpenWrt/ImmortalWrt-এর জন্য একটি EasyMesh প্লাগই
 ## মূল বৈশিষ্ট্য
 
 - **মেশ কোর:** Batman-adv 802.11s মেশ দ্বি-ব্যান্ড + তারযুক্ত ব্যাকহল ফলব্যাক এবং লুপ প্রতিরোধ সহ (সার্ভার এবং ক্লায়েন্ট উভয় ভূমিকাতেই উপলব্ধ)
-- **স্প্লিট-ব্যান্ড ক্লায়েন্ট SSID** (স্টিকি-2.4 GHz ক্লায়েন্ট প্রতিরোধ করে)
+- **স্প্লিট-ব্যান্ড ক্লায়েন্ট SSID** (Service Set Identifier — WiFi নেটওয়ার্কের নাম; স্টিকি-2.4 GHz ক্লায়েন্ট প্রতিরোধ করে)
 - **ব্যাকহল সমর্থন:** মিশ্র তারযুক্ত এবং বেতার সংযোগের জন্য `kmod-batman-adv` এবং 802.11s একত্রিত করে
 - **তারযুক্ত ব্যাকহল পোর্ট হ্যান্ডলিং:** প্রয়োগের সময় পোর্ট স্বয়ংক্রিয়ভাবে LAN ব্রিজ থেকে সরানো হয়
 - **সংযোগ অগ্রাধিকার:** তারযুক্ত → 6 GHz → 5 GHz → 2.4 GHz (`throughput_override`)
@@ -109,8 +95,8 @@ OpenWrt/ImmortalWrt-এর জন্য একটি EasyMesh প্লাগই
 - **প্রতিবেশী MAC + সর্বশেষ-দেখা** তারযুক্ত ব্যাকহলের জন্য (batman originator টেবিল থেকে)
 - **মেশ VLAN** — 802.1Q-এর মাধ্যমে মেশ জুড়ে অতিথি / IoT / হটস্পট নেটওয়ার্ক প্রসারিত করুন
 - **সার্ভার এবং ক্লায়েন্টের জন্য স্বয়ংক্রিয় ফায়ারওয়াল ও ইন্টারফেস কনফিগারেশন**
-- **নমনীয় নোড অ্যাড্রেসিং:** DHCP, Static IP এবং Dumb AP মোড
-- **রোমিং অপ্টিমাইজেশন:** দ্রুত ক্লায়েন্ট রোমিংয়ের জন্য `dawn` / `usteer` ডেমন সমর্থন সহ 802.11k/v/r একত্রিত করে
+- **নমনীয় নোড অ্যাড্রেসিং:** DHCP (Dynamic Host Configuration Protocol), Static IP এবং Dumb AP মোড
+- **রোমিং অপ্টিমাইজেশন:** দ্রুত ক্লায়েন্ট রোমিংয়ের জন্য `dawn` / `usteer` ডেমন সমর্থন সহ 802.11k/v/r (দ্রুত-রোমিং মান) একত্রিত করে
   - উন্নত K/V/R সেটিংস + Mobility Domain
   - `dawn` বা `usteer` এর একটির নিজস্ব luci-app ব্যবহার করলে ডিভাইস/অ্যাপ্লিকেশনের মধ্যে স্যুইচ করার সময় লেটেন্সি উল্লেখযোগ্যভাবে হ্রাস পায়
 - **হটপ্লাগ + init + ঐচ্ছিক cron ফলব্যাক** সংযোগ অগ্রাধিকারের জন্য
@@ -157,7 +143,7 @@ OpenWrt/ImmortalWrt-এর জন্য একটি EasyMesh প্লাগই
 
 ### ১. wpad পরীক্ষা করুন — আপনার কি নির্দিষ্ট wpad ভেরিয়েন্ট দরকার?
 
-EasyMesh-এর 802.11s ব্যাকহল তৈরি করতে একটি **মেশ-সক্ষম wpad** প্রয়োজন। বেশিরভাগ রাউটারে ইতিমধ্যে একটি ইনস্টল করা আছে। প্রথমে পরীক্ষা করুন:
+EasyMesh-এর 802.11s ব্যাকহল তৈরি করতে একটি **মেশ-সক্ষম wpad** (Wireless Protected Access Daemon) প্রয়োজন। বেশিরভাগ রাউটারে ইতিমধ্যে একটি ইনস্টল করা আছে। প্রথমে পরীক্ষা করুন:
 
 ```sh
 # রাউটারে — EasyMesh ইনস্টল করার আগে এটি চালান
@@ -186,11 +172,11 @@ apk list --installed 2>/dev/null | grep wpad
 | `wpad-mbedtls` | OpenWrt 24.10 ডিফল্ট যখন openssl অনুপলব্ধ |
 
 ```sh
-# opkg (≤ 24.10)
+# opkg (OpenWrt 24.10 এবং তার পুরানো সংস্করণ)
 opkg install wpad-openssl        # বা wpad-wolfssl / wpad-mbedtls
 opkg remove wpad-basic-mbedtls   # যদি আপনি একটি basic ভেরিয়েন্ট প্রতিস্থাপন করছেন
 
-# apk (≥ 25.12)
+# apk (OpenWrt 25.12+)
 apk add wpad-openssl             # বা wpad-wolfssl / wpad-mbedtls
 apk del wpad-basic-mbedtls       # যদি আপনি একটি basic ভেরিয়েন্ট প্রতিস্থাপন করছেন
 ```
@@ -264,15 +250,35 @@ rm -f /tmp/luci-indexcache /tmp/luci-modulecache/* && \
 /etc/init.d/rpcd restart && /etc/init.d/uhttpd restart
 ```
 
-### ৩. ঐচ্ছিক — চীনা (সরলীকৃত) অনুবাদ
+### ৩. ঐচ্ছিক — ভাষা প্যাক
+
+EasyMesh ডিফল্টভাবে ইংরেজিতে আসে। বাংলা এবং চীনা (সরলীকৃত) অনুবাদ আলাদা প্যাকেজ হিসাবে উপলব্ধ।
+
+**বাংলা (Bengali)**
 
 ```sh
 # opkg (≤ 24.10)
-cd /tmp && wget https://github.com/arafatrahmanzami/luci-app-easymesh/releases/download/2.4.1-r1/luci-i18n-easymesh-zh-cn_2.4.1-r1_all.ipk && opkg install luci-i18n-easymesh-zh-cn_2.4.1-r1_all.ipk
+cd /tmp && wget https://github.com/arafatrahmanzami/luci-app-easymesh/releases/download/2.4.1-r1/luci-i18n-easymesh-bn_26.184.37259.7cad107_all.ipk && opkg install luci-i18n-easymesh-bn_26.184.37259.7cad107_all.ipk
 
 # apk (≥ 25.12)
-cd /tmp && wget https://github.com/arafatrahmanzami/luci-app-easymesh/releases/download/2.4.1-r1/luci-i18n-easymesh-zh-cn-2.4.1-r1.apk && apk add --allow-untrusted luci-i18n-easymesh-zh-cn-2.4.1-r1.apk
+cd /tmp && wget https://github.com/arafatrahmanzami/luci-app-easymesh/releases/download/2.4.1-r1/luci-i18n-easymesh-bn-26.184.37259.7cad107.apk && apk add --allow-untrusted luci-i18n-easymesh-bn-26.184.37259.7cad107.apk
 ```
+
+তারপর UI ভাষা পরিবর্তন করুন: **System → System → Language and Style → Language → বাংলা (Bengali)**।
+
+**চীনা (সরলীকৃত) / 简体中文**
+
+```sh
+# opkg (≤ 24.10)
+cd /tmp && wget https://github.com/arafatrahmanzami/luci-app-easymesh/releases/download/2.4.1-r1/luci-i18n-easymesh-zh-cn_26.184.37259.7cad107_all.ipk && opkg install luci-i18n-easymesh-zh-cn_26.184.37259.7cad107_all.ipk
+
+# apk (≥ 25.12)
+cd /tmp && wget https://github.com/arafatrahmanzami/luci-app-easymesh/releases/download/2.4.1-r1/luci-i18n-easymesh-zh-cn-26.184.37259.7cad107.apk && apk add --allow-untrusted luci-i18n-easymesh-zh-cn-26.184.37259.7cad107.apk
+```
+
+তারপর UI ভাষা পরিবর্তন করুন: **System → System → Language and Style → Language → 中文 (Chinese)**।
+
+> **ফাইলনাম সম্পর্কে নোট:** GitHub রিলিজ asset নামের `~` কে `.` দিয়ে প্রতিস্থাপন করে। উপরের i18n সংস্করণ স্ট্রিং `.7cad107` ব্যবহার করে — ডাউনলোড URL এই ফর্মটি ব্যবহার করতেই হবে। প্যাকেজ মেটাডেটা (সংস্করণ `26.184.37259~7cad107`) অপরিবর্তিত থাকে।
 
 ### ৪. অফলাইন / apk / ipk / tarball ইনস্টল (রাউটারে ইন্টারনেট ছাড়া)
 
@@ -328,7 +334,7 @@ rm -f /tmp/luci-indexcache /tmp/luci-modulecache/*
 | `/usr/lib/lua/luci/controller/easymesh.lua` | LuCI কন্ট্রোলার |
 | `/usr/lib/lua/luci/model/cbi/easymesh.lua` | কনফিগারেশন UI |
 | `/etc/init.d/easymesh` | init লিপি (bat0, mesh VIFs, তারযুক্ত ব্যাকহল, অগ্রাধিকার) |
-| `/etc/config/easymesh` | UCI কনফিগার |
+| `/etc/config/easymesh` | UCI (Unified Configuration Interface) কনফিগার |
 | `/etc/hotplug.d/iface/30-easymesh-priority` | ইন্টারফেস চালু হলে সংযোগ অগ্রাধিকার পুনঃপ্রয়োগ |
 | `/etc/rc.wps/easymesh-pair` | WPS বোতাম পরিবেশক |
 | `/etc/uci-defaults/luci-easymesh` | প্রথম-চালনার সেটআপ |
@@ -343,15 +349,13 @@ rm -f /tmp/luci-indexcache /tmp/luci-modulecache/*
 2. **ক্লায়েন্ট** (এক্সটেন্ডার): role: **Client**, একই **Mesh ID**, **AP Mode: ON**, static IP
 3. **উভয়ে**: একই পাসওয়ার্ড, **K/V/R** চালু
 
-### সার্ভার পেজ কেমন দেখায়
+**দ্রুত সেটআপ প্রিসেট** — একটি ভূমিকা বাছাই করুন, একটি বোতাম ক্লিক করুন, সম্পন্ন:
 
-![Mesh settings](../screenshots-bn/04-mesh-settings_bn.png)
+![Quick Setup presets 1-9](../screenshots-bn/02-quick-setup-1-9_bn.png)
 
-### ক্লায়েন্ট + AP মোড পেজ কেমন দেখায়
+![Quick Setup presets 10-19](../screenshots-bn/03-quick-setup-10-19_bn.png)
 
-![Client WiFi + AP Mode](../screenshots-bn/05-client-wifi-ap-mode_bn.png)
-
-উভয়েই Save & Apply করার পর প্রায় ৩০ সেকেন্ড অপেক্ষা করুন। সার্ভারে **Network → EasyMesh** খুলুন — আপনার সঙ্গী টেবিলে ক্লায়েন্টের MAC দেখা উচিত:
+উভয় রাউটারে Save & Apply করার পর প্রায় ৩০ সেকেন্ড অপেক্ষা করুন। সার্ভারে **Network → EasyMesh** খুলুন — আপনার সঙ্গী টেবিলে ক্লায়েন্টের MAC দেখা উচিত:
 
 ![EasyMesh dashboard](../screenshots-bn/01-dashboard_bn.png)
 
@@ -400,9 +404,6 @@ rm -f /tmp/luci-indexcache /tmp/luci-modulecache/*
 ### ধাপ ৪ — প্রতিবেশী নোড যাচাই করুন
 
 - Mesh Server-এ **Network → EasyMesh** এ যান এবং কাছাকাছি নোডগুলি **Mesh Status** এর অধীনে তালিকাভুক্ত কিনা দেখুন।
-
-  ![EasyMesh dashboard](../screenshots-bn/01-dashboard_bn.png)
-
 - **Network → Wireless** এ যান এবং Mesh Backhaul নেটওয়ার্কগুলি সার্ভারের সাথে যোগাযোগ করছে কিনা যাচাই করুন।
 - **Status → Overview → DHCP Devices** এর অধীনে আপনার Mesh নোডগুলির IP খুঁজুন।
 - ব্রাউজারে এর IP লিখে একটি নোড অ্যাক্সেস করুন।
@@ -450,7 +451,7 @@ rm -f /tmp/luci-indexcache /tmp/luci-modulecache/*
 
 সাধারণত, আপনি যখন একটি মেশ এক্সটেন্ডার যোগ করেন, শুধুমাত্র **মূল নেটওয়ার্ক** এক্সটেন্ডারে ছড়িয়ে পড়ে। এক্সটেন্ডারে সংযুক্ত অতিথিরা এখনও মূল-নেটওয়ার্ক বিশেষাধিকার পায়, যা একটি নিরাপত্তা ফাঁক।
 
-**EasyMesh-এর Mesh VLAN বৈশিষ্ট্য তিনটি নেটওয়ার্ককেই মেশ জুড়ে ছড়িয়ে দেয়** — যাতে একটি এক্সটেন্ডার নোডে একজন অতিথি এখনও অতিথি থাকে, এবং একটি এক্সটেন্ডারে একটি IoT ডিভাইস এখনও বিচ্ছিন্ন IoT নেটওয়ার্কে থাকে।
+**EasyMesh-এর Mesh VLANs** (Virtual LANs) বৈশিষ্ট্য তিনটি নেটওয়ার্ককেই মেশ জুড়ে ছড়িয়ে দেয় — যাতে একটি এক্সটেন্ডার নোডে একজন অতিথি এখনও অতিথি থাকে, এবং একটি এক্সটেন্ডারে একটি IoT ডিভাইস এখনও বিচ্ছিন্ন IoT নেটওয়ার্কে থাকে।
 
 ![Link priority weights + Mesh VLANs](../screenshots-bn/07-priority-vlans_bn.png)
 
@@ -569,7 +570,7 @@ uci show network | grep -E "br-guest|br-iot"
 
 ### সাধারণ পরিস্থিতি
 
-#### শুধুমাত্র অতিথি নেটওয়ার্ক
+**শুধুমাত্র অতিথি নেটওয়ার্ক**
 
 ```sh
 uci set easymesh.config.mesh_vlans='10'
@@ -577,7 +578,7 @@ uci commit easymesh
 /etc/init.d/easymesh restart
 ```
 
-#### অতিথি + IoT
+**অতিথি + IoT**
 
 ```sh
 uci set easymesh.config.mesh_vlans='10,20'
@@ -585,7 +586,7 @@ uci commit easymesh
 /etc/init.d/easymesh restart
 ```
 
-#### অতিথি + IoT + হটস্পট
+**অতিথি + IoT + হটস্পট**
 
 ```sh
 uci set easymesh.config.mesh_vlans='10,20,30'
@@ -593,7 +594,7 @@ uci commit easymesh
 /etc/init.d/easymesh restart
 ```
 
-#### স্বয়ংক্রিয়-সংযুক্তি — ম্যানুয়াল ব্রিজিং প্রয়োজন নেই
+**স্বয়ংক্রিয়-সংযুক্তি — ম্যানুয়াল ব্রিজিং প্রয়োজন নেই**
 
 যদি আপনার বিদ্যমান ব্রিজগুলি শেষে VLAN ID দিয়ে নামকরণ করা হয়, EasyMesh স্বয়ংক্রিয়ভাবে VLAN ডিভাইস সংযুক্ত করে। স্বীকৃত প্যাটার্ন:
 
@@ -688,7 +689,7 @@ uci show network | grep 8021q   # কিছুই প্রিন্ট কর�
 
 Batman-adv `throughput_override` দ্বারা সংযোগ গুণমান গুণ করে সেরা পথ বেছে নেয়। EasyMesh UI-তে এই মানগুলি প্রকাশ করে:
 
-![Link priority weights](../screenshots-bn/07-priority-vlans_bn.png)
+![Wired backhaul safety + link priority state](../screenshots-bn/06-wired-backhaul-safety_bn.png)
 
 **ডিফল্ট:**
 
@@ -710,9 +711,7 @@ Batman-adv `throughput_override` দ্বারা সংযোগ গুণম
 
 **রিয়েল টাইমে বর্তমান মান যাচাই করুন:**
 
-মেশ টেবিলে **Priority weight** কলামটি প্রতিটি ইন্টারফেসে প্রয়োগ করা প্রকৃত `throughput_override` দেখায়, প্রতিটি পেজ লোডে রিফ্রেশ হয়:
-
-![EasyMesh dashboard](../screenshots-bn/01-dashboard_bn.png)
+মেশ টেবিলে **Priority weight** কলামটি প্রতিটি ইন্টারফেসে প্রয়োগ করা প্রকৃত `throughput_override` দেখায়, প্রতিটি পেজ লোডে রিফ্রেশ হয়। [দ্রুত শুরু](#দ্রুত-শুরু) বিভাগে ড্যাশবোর্ড স্ক্রিনশট দেখুন।
 
 **প্রয়োগ করুন:**
 
@@ -786,9 +785,7 @@ sleep 15
 batctl hardif eth0 throughput_override   # 1000.0 MBit দেখানো উচিত
 ```
 
-অথবা **Network → EasyMesh → Boot-time reliability**-এ **Cron fallback** চেকবক্স সক্রিয় করুন:
-
-![Boot-time reliability](../screenshots-bn/01-dashboard_bn.png)
+অথবা **Network → EasyMesh → Boot-time reliability**-এ **Cron fallback** চেকবক্স সক্রিয় করুন।
 
 এটি প্রতি মিনিটে অগ্রাধিকার পুনঃপ্রয়োগ করে — নিরাপদ, idempotent, এবং রাউটারে যেখানে বেতার ড্রাইভার ধীরে লোড হয় সেখানে সহায়ক।
 
@@ -841,7 +838,7 @@ batctl hardif eth0 throughput_override   # 1000.0 MBit দেখানো উচ
 **পরিবর্তিত**
 
 - ৪টি প্যাকেজে বিভক্ত: মূল + 3 wpad মেটা
-- IPK `dpkg-deb` দিয়ে তৈরি
+- IPK SDK-এর `ipkg-build` দিয়ে তৈরি (gzipped-tar, OpenWrt-সামঞ্জস্যপূর্ণ)
 
 ---
 

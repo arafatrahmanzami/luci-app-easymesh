@@ -2,7 +2,7 @@
 
 # luci-app-easymesh
 
-An EasyMesh plugin for OpenWrt/ImmortalWrt — a lightweight LuCI interface that simplifies deploying Batman-adv layer-2 mesh networks with 802.11s wireless and wired backhaul. It can also be used standalone without a hotspot or VPN.
+An EasyMesh plugin for OpenWrt/ImmortalWrt — a lightweight LuCI (OpenWrt's web-based configuration UI) interface that simplifies deploying Batman-adv layer-2 mesh networks with 802.11s (IEEE WiFi mesh standard) wireless and wired backhaul. It can also be used standalone without a hotspot or VPN (Virtual Private Network).
 
 **Release:** `2.4.1-r1` — 2026-09-16 — by [@arafatrahmanzami](https://github.com/arafatrahmanzami)
 
@@ -33,20 +33,6 @@ It also lets you **connect the routers with Ethernet cables** for faster backhau
 
 ---
 
-## Preview
-
-**Dashboard** — live peers, wired backhaul state, link priorities:
-
-![EasyMesh dashboard](docs/screenshots/01-dashboard.png)
-
-**Quick Setup presets** — pick a role, click one button, done:
-
-![Quick Setup presets 1-9](docs/screenshots/02-quick-setup-1-9.png)
-
-![Quick Setup presets 10-19](docs/screenshots/03-quick-setup-10-19.png)
-
----
-
 ## Table of Contents
 
 - [What does this actually do?](#what-does-this-actually-do)
@@ -66,6 +52,7 @@ It also lets you **connect the routers with Ethernet cables** for faster backhau
 - [Changelog](#changelog)
 - [Compile from Source](#compile-from-source-openwrt-sdk)
 - [Credits](#credits)
+- [Glossary](#glossary)
 - [License](#license)
 
 ---
@@ -90,7 +77,7 @@ It also makes it faster and easier to deploy an advanced wired + WiFi mesh for e
 ## Key Features
 
 - **Mesh core:** Batman-adv 802.11s mesh with dual-band + wired backhaul fallback and loop prevention (available on both Server and Client roles)
-- **Split-band client SSIDs** (prevents sticky-2.4 GHz clients)
+- **Split-band client SSIDs** (Service Set Identifiers — the WiFi network names; split-band prevents sticky-2.4 GHz clients)
 - **Backhaul support:** combines `kmod-batman-adv` and 802.11s for mixed wired and wireless connections
 - **Wired backhaul port handling:** port is automatically removed from the LAN bridge on apply
 - **Link priority:** wired → 6 GHz → 5 GHz → 2.4 GHz (`throughput_override`)
@@ -108,8 +95,8 @@ It also makes it faster and easier to deploy an advanced wired + WiFi mesh for e
 - **Neighbor MAC + last-seen** for wired backhaul (from the batman originator table)
 - **Mesh VLANs** — extend guest / IoT / hotspot networks across the mesh via 802.1Q
 - **Auto firewall & interface configuration** for servers and clients
-- **Flexible node addressing:** DHCP, Static IP, and Dumb AP modes
-- **Roaming optimization:** integrates 802.11k/v/r with `dawn` / `usteer` daemon support for fast client roaming between access points
+- **Flexible node addressing:** DHCP (Dynamic Host Configuration Protocol), Static IP, and Dumb AP modes
+- **Roaming optimization:** integrates 802.11k/v/r (fast-roaming standards) with `dawn` / `usteer` daemon support for fast client roaming between access points
   - Advanced K/V/R settings + Mobility Domain
   - Using one of `dawn` or `usteer` via their respective luci-apps significantly reduces latency when switching between devices/applications
 - **Hotplug + init + optional cron fallback** for link priority
@@ -156,7 +143,7 @@ You can quickly build a completely standard mesh wireless network using only Ope
 
 ### 1. Check wpad — do you need a specific wpad variant?
 
-EasyMesh requires a **mesh-capable wpad** to create the 802.11s backhaul. Most routers already have one installed. Check first:
+EasyMesh requires a **mesh-capable wpad** (Wireless Protected Access Daemon) to create the 802.11s backhaul. Most routers already have one installed. Check first:
 
 ```sh
 # On the router — run this before installing EasyMesh
@@ -185,11 +172,11 @@ Pick **one** variant. Match what your distribution uses by default:
 | `wpad-mbedtls` | OpenWrt 24.10 default when openssl is unavailable |
 
 ```sh
-# opkg (≤ 24.10)
+# opkg (OpenWrt 24.10 and older)
 opkg install wpad-openssl        # or wpad-wolfssl / wpad-mbedtls
 opkg remove wpad-basic-mbedtls   # if you're replacing a basic variant
 
-# apk (≥ 25.12)
+# apk (OpenWrt 25.12+)
 apk add wpad-openssl             # or wpad-wolfssl / wpad-mbedtls
 apk del wpad-basic-mbedtls       # if you're replacing a basic variant
 ```
@@ -263,15 +250,35 @@ rm -f /tmp/luci-indexcache /tmp/luci-modulecache/* && \
 /etc/init.d/rpcd restart && /etc/init.d/uhttpd restart
 ```
 
-### 3. Optional — Chinese (Simplified) translation
+### 3. Optional — language packs
+
+EasyMesh ships with English (default). Bengali and Chinese (Simplified) translations are available as separate packages.
+
+**Bengali (বাংলা)**
 
 ```sh
 # opkg (≤ 24.10)
-cd /tmp && wget https://github.com/arafatrahmanzami/luci-app-easymesh/releases/download/2.4.1-r1/luci-i18n-easymesh-zh-cn_2.4.1-r1_all.ipk && opkg install luci-i18n-easymesh-zh-cn_2.4.1-r1_all.ipk
+cd /tmp && wget https://github.com/arafatrahmanzami/luci-app-easymesh/releases/download/2.4.1-r1/luci-i18n-easymesh-bn_26.184.37259.7cad107_all.ipk && opkg install luci-i18n-easymesh-bn_26.184.37259.7cad107_all.ipk
 
 # apk (≥ 25.12)
-cd /tmp && wget https://github.com/arafatrahmanzami/luci-app-easymesh/releases/download/2.4.1-r1/luci-i18n-easymesh-zh-cn-2.4.1-r1.apk && apk add --allow-untrusted luci-i18n-easymesh-zh-cn-2.4.1-r1.apk
+cd /tmp && wget https://github.com/arafatrahmanzami/luci-app-easymesh/releases/download/2.4.1-r1/luci-i18n-easymesh-bn-26.184.37259.7cad107.apk && apk add --allow-untrusted luci-i18n-easymesh-bn-26.184.37259.7cad107.apk
 ```
+
+Then switch the UI language: **System → System → Language and Style → Language → বাংলা (Bengali)**.
+
+**Chinese (Simplified) / 简体中文**
+
+```sh
+# opkg (≤ 24.10)
+cd /tmp && wget https://github.com/arafatrahmanzami/luci-app-easymesh/releases/download/2.4.1-r1/luci-i18n-easymesh-zh-cn_26.184.37259.7cad107_all.ipk && opkg install luci-i18n-easymesh-zh-cn_26.184.37259.7cad107_all.ipk
+
+# apk (≥ 25.12)
+cd /tmp && wget https://github.com/arafatrahmanzami/luci-app-easymesh/releases/download/2.4.1-r1/luci-i18n-easymesh-zh-cn-26.184.37259.7cad107.apk && apk add --allow-untrusted luci-i18n-easymesh-zh-cn-26.184.37259.7cad107.apk
+```
+
+Then switch the UI language: **System → System → Language and Style → Language → 中文 (Chinese)**.
+
+> **Note on filenames:** GitHub replaces `~` with `.` in release asset names. The i18n version string above uses `.7cad107` — download URLs must use this form. The package metadata (version `26.184.37259~7cad107`) is unchanged.
 
 ### 4. Offline / apk / ipk / tarball install (no internet on router/AP)
 
@@ -327,7 +334,7 @@ rm -f /tmp/luci-indexcache /tmp/luci-modulecache/*
 | `/usr/lib/lua/luci/controller/easymesh.lua` | LuCI controller |
 | `/usr/lib/lua/luci/model/cbi/easymesh.lua` | Configuration UI |
 | `/etc/init.d/easymesh` | Init script (bat0, mesh VIFs, wired backhaul, priority) |
-| `/etc/config/easymesh` | UCI config |
+| `/etc/config/easymesh` | UCI (Unified Configuration Interface) config |
 | `/etc/hotplug.d/iface/30-easymesh-priority` | Reapplies link priority on interface up |
 | `/etc/rc.wps/easymesh-pair` | WPS button handler |
 | `/etc/uci-defaults/luci-easymesh` | First-run setup |
@@ -342,15 +349,13 @@ rm -f /tmp/luci-indexcache /tmp/luci-modulecache/*
 2. **Client** (extender): role: **Client**, same **Mesh ID**, **AP Mode: ON**, static IP
 3. **Both**: same passwords, **K/V/R** on
 
-### What the Server page looks like
+**Quick Setup presets** — pick a role, click one button, done:
 
-![Mesh settings](docs/screenshots/04-mesh-settings.png)
+![Quick Setup presets 1-9](docs/screenshots/02-quick-setup-1-9.png)
 
-### What the Client + AP Mode page looks like
+![Quick Setup presets 10-19](docs/screenshots/03-quick-setup-10-19.png)
 
-![Client WiFi + AP Mode](docs/screenshots/05-client-wifi-ap-mode.png)
-
-After Save & Apply on both, wait ~30 seconds. Open **Network → EasyMesh** on the Server — you should see the Client's MAC in the peers table:
+After Save & Apply on both routers, wait ~30 seconds. Open **Network → EasyMesh** on the Server — you should see the Client's MAC in the peers table:
 
 ![EasyMesh dashboard](docs/screenshots/01-dashboard.png)
 
@@ -398,9 +403,6 @@ After Save & Apply on both, wait ~30 seconds. Open **Network → EasyMesh** on t
 ### Step 4 — Verify Neighbor Nodes
 
 - Go to **Network → EasyMesh** on the Mesh Server and check that nearby nodes are listed under **Mesh Status**.
-
-  ![EasyMesh dashboard](docs/screenshots/01-dashboard.png)
-
 - Go to **Network → Wireless** and verify that Mesh Backhaul Networks are communicating with the server.
 - Find your Mesh Nodes' IPs under **Status → Overview → DHCP Devices**.
 - Access a node by entering its IP in a browser.
@@ -447,7 +449,7 @@ Imagine your home has **three separate networks**:
 
 Normally, when you add a mesh extender, only the **main network** spreads to the extender. Guests connecting to the extender still get main-network privileges, which is a security hole.
 
-**EasyMesh's Mesh VLANs feature lets all three networks spread across the mesh** — so a Guest on an extender node is still a Guest, and an IoT device on an extender is still on the isolated IoT network.
+**EasyMesh's Mesh VLANs** (Virtual LANs) feature lets all three networks spread across the mesh — so a Guest on an extender node is still a Guest, and an IoT device on an extender is still on the isolated IoT network.
 
 ![Link priority weights + Mesh VLANs](docs/screenshots/07-priority-vlans.png)
 
@@ -566,7 +568,7 @@ Look for `ports='...' bat0.10` in the guest bridge and `ports='...' bat0.20` in 
 
 ### Common scenarios
 
-#### Guest network only
+**Guest network only**
 
 ```sh
 uci set easymesh.config.mesh_vlans='10'
@@ -574,7 +576,7 @@ uci commit easymesh
 /etc/init.d/easymesh restart
 ```
 
-#### Guest + IoT
+**Guest + IoT**
 
 ```sh
 uci set easymesh.config.mesh_vlans='10,20'
@@ -582,7 +584,7 @@ uci commit easymesh
 /etc/init.d/easymesh restart
 ```
 
-#### Guest + IoT + Hotspot
+**Guest + IoT + Hotspot**
 
 ```sh
 uci set easymesh.config.mesh_vlans='10,20,30'
@@ -590,7 +592,7 @@ uci commit easymesh
 /etc/init.d/easymesh restart
 ```
 
-#### Auto-attach — no manual bridging needed
+**Auto-attach — no manual bridging needed**
 
 If your existing bridges are named with the VLAN ID at the end, EasyMesh attaches the VLAN device automatically. Recognized patterns:
 
@@ -685,7 +687,7 @@ You don't need to understand this to use it, but it helps when debugging.
 
 Batman-adv chooses the best path by multiplying link quality by `throughput_override`. EasyMesh exposes these values in the UI:
 
-![Link priority weights](docs/screenshots/07-priority-vlans.png)
+![Wired backhaul safety + link priority state](docs/screenshots/06-wired-backhaul-safety.png)
 
 **Defaults:**
 
@@ -707,9 +709,7 @@ Higher value = more likely to be chosen. Set to `0` to let batman decide purely 
 
 **Verify current values in real time:**
 
-The **Priority weight** column in the mesh tables shows the actual `throughput_override` applied to each interface, refreshed every page load:
-
-![EasyMesh dashboard](docs/screenshots/01-dashboard.png)
+The **Priority weight** column in the mesh tables shows the actual `throughput_override` applied to each interface, refreshed every page load. See the dashboard screenshot in [Quick Start](#quick-start).
 
 **Apply:**
 
@@ -783,9 +783,7 @@ sleep 15
 batctl hardif eth0 throughput_override   # should show 1000.0 MBit
 ```
 
-Or enable the **Cron fallback** checkbox in **Network → EasyMesh → Boot-time reliability**:
-
-![Boot-time reliability](docs/screenshots/01-dashboard.png)
+Or enable the **Cron fallback** checkbox in **Network → EasyMesh → Boot-time reliability**.
 
 This makes the priority reapply every minute — safe, idempotent, and useful on routers where the wireless driver loads slowly.
 
@@ -838,7 +836,7 @@ This makes the priority reapply every minute — safe, idempotent, and useful on
 **Changed**
 
 - Split into 4 packages: main + 3 wpad metas
-- IPK built with `dpkg-deb`
+- IPK built with SDK's `ipkg-build` (gzipped-tar, OpenWrt-compatible)
 
 ---
 
@@ -912,6 +910,154 @@ make package/luci-app-easymesh/compile V=s
 - **Current maintainer:** Arafat Rahman Zami Mondol <zamimondol@gmail.com>
 
 For further exploration, check the source code or track releases on the reference repositories listed above.
+
+---
+
+## Glossary
+
+Terms used in this README that may be unfamiliar, especially if you're new to OpenWrt or networking. Terms that lose meaning when translated are kept in English.
+
+### Network fundamentals
+
+| Term | Full form | Meaning |
+|---|---|---|
+| **WiFi** | Wireless Fidelity | The standard name for wireless network connectivity. |
+| **LAN** | Local Area Network | The network inside your home or office — connects devices locally. |
+| **WAN** | Wide Area Network | The broader network — usually the internet connection from your ISP. |
+| **AP** | Access Point | Broadcasts WiFi that devices can connect to. |
+| **IP** | Internet Protocol | Each network device's unique address (e.g. `192.168.1.1`). |
+| **MAC** | Media Access Control | Each network card's unique hardware identifier (e.g. `00:11:22:33:44:55`). |
+| **DHCP** | Dynamic Host Configuration Protocol | Service that automatically assigns IP addresses to devices. |
+| **DNS** | Domain Name System | Translates domain names to IP addresses (e.g. `google.com` → `142.250.185.78`). |
+| **SSID** | Service Set Identifier | The WiFi network name you see on your phone (e.g. `EasyMesh_WiFi`). |
+| **VLAN** | Virtual LAN | Technique to create multiple logical networks on one physical network (e.g. guest network). |
+| **VPN** | Virtual Private Network | An encrypted connection over the internet that protects privacy. |
+
+### Wireless standards & protocols
+
+| Term | Meaning |
+|---|---|
+| **802.11s** | IEEE standard for mesh networking — routers connect directly to each other. |
+| **802.11k/v/r** | Three IEEE standards that together provide fast roaming — your phone automatically moves to the nearest router as you walk around. |
+| **802.11k** | Shares information about nearby access points. |
+| **802.11v** | Suggests to a client which access point to connect to. |
+| **802.11r** | Fast roaming — move to another router without dropping the connection. |
+| **802.1Q** | VLAN tagging standard. Adds a tag to data packets to mark which network they belong to. |
+| **WPA2** | WiFi Protected Access 2 — older but still-used network encryption standard. |
+| **WPA3** | WiFi Protected Access 3 — successor to WPA2, stronger encryption. |
+| **SAE** | Simultaneous Authentication of Equals — the password-based authentication method used in WPA3. |
+| **K/V/R** | Short for 802.11k/v/r above. |
+| **AX / AC / N** | WiFi 6 (AX), WiFi 5 (AC), WiFi 4 (N) — wireless standard generations. |
+| **2.4 GHz / 5 GHz / 6 GHz** | Wireless signal frequencies — 2.4 GHz longer range but slower; 5/6 GHz faster but shorter range. |
+| **MIMO** | Multiple-Input Multiple-Output — sending and receiving data simultaneously via multiple antennas. |
+| **MU-MIMO** | Multi-User MIMO — communicating with multiple devices at the same time. |
+
+### OpenWrt ecosystem
+
+| Term | Meaning |
+|---|---|
+| **OpenWrt** | Open-source router firmware, Linux-based. Gives full control over the router. |
+| **ImmortalWrt** | A fork of OpenWrt maintained by the Chinese community, with some extra packages and default settings. |
+| **LuCI** | OpenWrt's web-based configuration interface — what opens when you visit `http://<router-ip>` in a browser. |
+| **UCI** | Unified Configuration Interface — OpenWrt's system for storing all configuration in one place, under `/etc/config/`. |
+| **opkg** | Package manager used by OpenWrt 24.10 and older. Installs `.ipk` files. |
+| **apk** | Newer package manager used by OpenWrt 25.12+ and Alpine Linux. Installs `.apk` files. |
+| **procd** | OpenWrt's service manager — controls when a service starts. |
+| **rpcd** | The service behind LuCI that processes web interface requests. |
+| **uhttpd** | The lightweight HTTP server that serves LuCI web pages. |
+| **Batman-adv** | Better Approach To Mobile Adhoc Networking — Advanced — mesh routing protocol. Decides which path data takes. |
+| **batctl** | Command-line tool to control and diagnose Batman-adv. |
+| **bat0** | Batman-adv's virtual network interface through which mesh traffic flows. |
+| **hardif** | Hardware Interface — the real interface Batman-adv uses (e.g. `eth0`, `phy0-mesh0`). |
+| **wpad** | Wireless Protected Access Daemon — the service managing WiFi on OpenWrt. Has multiple variants (openssl/wolfssl/mbedtls). |
+| **wpad-mesh** | A special variant of wpad that supports 802.11s mesh. |
+| **kmod** | Kernel Module — additional code loadable into the kernel (e.g. `kmod-batman-adv`). |
+| **dawn** | An access-point steering daemon — guides clients to the best AP. |
+| **usteer** | User-space steerer — alternative to dawn, lighter and faster. |
+
+### Shell commands
+
+| Command | Meaning |
+|---|---|
+| `uci set` | Set a value in UCI config. |
+| `uci get` | Read a value from UCI config. |
+| `uci commit` | Save changed values permanently. |
+| `uci show` | Display current UCI config. |
+| `opkg install` | Install a package with opkg. |
+| `opkg update` | Refresh package list. |
+| `apk add` | Install a package with apk. |
+| `apk del` | Remove a package with apk. |
+| `batctl n` | Show Batman-adv neighbor list. |
+| `batctl if` | Show Batman-adv interface list. |
+| `batctl o` | Show Batman-adv originator table (full mesh topology). |
+| `batctl ping` | Ping at the Batman-adv layer. |
+| `iw dev` | List wireless interfaces. |
+| `wget` | Download a file. |
+| `scp` | Secure file copy (over SSH). |
+| `ssh` | Secure remote shell connection. |
+| `reboot` | Restart the router. |
+| `logread` | Read the system log. |
+| `ip link` | Show network interface status. |
+| `ifup` / `ifdown` | Bring an interface up / down. |
+| `chmod +x` | Make a file executable (runnable). |
+
+### Units & measurements
+
+| Unit | Meaning |
+|---|---|
+| **bit** | The smallest unit of digital information (0 or 1). |
+| **Byte** | 8 bits. Written with capital `B`. |
+| **Kbit/s** | Kilobits per second — rate of data transfer. |
+| **Mbit** | Megabit = 1000 kilobits. |
+| **Gbit** | Gigabit = 1000 megabits. |
+| **Mbps** | Megabits per second = 1000 Kbit/s. |
+| **MHz / GHz** | Megahertz / gigahertz — radio frequency. 1 GHz = 1000 MHz. |
+| **ms** | Millisecond = 1/1000 of a second. Used for latency measurements. |
+
+### Interface naming
+
+| Name | Meaning |
+|---|---|
+| **eth0, eth1** | Ethernet interface (wired). On some routers, the internal CPU port. |
+| **lan1, lan2, lan3** | LAN physical ports (wired). Usually where you plug devices in. |
+| **wan** | WAN port — for internet/ISP connection. |
+| **phy0-mesh0** | Mesh virtual wireless interface — carries 802.11s traffic. |
+| **phy0, phy1** | Wireless radio hardware identifiers. |
+| **radio0, radio1** | OpenWrt's names for radios. |
+| **bat0** | Batman-adv's virtual mesh interface. |
+| **br-lan** | LAN bridge interface — combines multiple ports into one network. |
+| **br-guest** | Guest network bridge. |
+| **wlan0, wlan1** | Wireless client/AP interfaces. |
+
+### UI & setup terms
+
+| Term | Meaning |
+|---|---|
+| **Server** | The main mesh router that provides internet. Has the internet connection. |
+| **Client** | Extender router — receives internet via the mesh. |
+| **Node** | Relay-only — only forwards traffic, doesn't receive or provide internet itself. |
+| **Dumb AP** | "Dumb" access point — DHCP and firewall disabled, only broadcasts WiFi. |
+| **Mesh ID** | Mesh network name — must be identical on all nodes. |
+| **Mobility Domain** | A 4-character hexadecimal identifier used in 802.11r fast roaming. |
+| **Save & Apply** | Button to save and apply changes. |
+| **Reapply EasyMesh Settings** | Button to re-apply current settings to the mesh. |
+| **Preset** | A pre-defined setting — one-click common configuration. |
+| **Rollback** | Reverting to the previous state if something breaks after a change. |
+| **Watchdog** | A monitoring process that performs a specific action at a specific time. |
+
+### Platform
+
+| Term | Meaning |
+|---|---|
+| **Git** | Version control system — tracks changes to code. |
+| **GitHub** | Git repository hosting platform. For sharing and collaborating on code. |
+| **Repository (Repo)** | A collection of code and files. |
+| **Commit** | A saved snapshot of code changes. |
+| **Branch** | A parallel version of the code. |
+| **Fork** | Your own copy of someone else's project, freely modifiable. |
+| **Release** | A specific version published for users. |
+| **Tag** | A named marker for a commit (e.g. `2.4.1-r1`). |
+| **Linux** | The open-source operating system kernel — foundation of OpenWrt and ImmortalWrt. |
 
 ---
 
