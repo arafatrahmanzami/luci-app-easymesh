@@ -23,12 +23,12 @@ LUCI_DEPENDS:= \
 	+batctl-default \
 	+luci-compat \
 	+luci-lua-runtime \
-	+libiwinfo-lua \
+	+libiwinfo-lua 
 
 # Client steering (works with or without usteer)
 LUCI_DEPENDS += \
 	+usteer \
-	+luci-app-usteer
+	+luci-app-usteer 
 
 LUCI_PKGARCH:=all
 
