@@ -5,7 +5,7 @@ PKG_VERSION:=2.4.1
 PKG_RELEASE:=1
 
 PKG_LICENSE:=GPL-2.0
-PKG_MAINTAINER:=Arafat Rahman Zami Mondol <arafatrahmanzami@users.noreply.github.com>
+PKG_MAINTAINER:=Arafat Rahman Zami Mondol <zamimondol@gmail.com>
 PKG_URL:=https://github.com/arafatrahmanzami/luci-app-easymesh
 
 LUCI_TITLE:=LuCI Management Interface for EasyMesh (Batman-adv mesh)
