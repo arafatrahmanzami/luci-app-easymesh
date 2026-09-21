@@ -281,31 +281,67 @@ Then switch the UI language: **System → System → Language and Style → Lang
 
 > **Note on filenames:** GitHub replaces `~` with `.` in release asset names. The i18n version string above uses `.7cad107` — download URLs must use this form. The package metadata (version `26.184.37259~7cad107`) is unchanged.
 
-### 4. Offline / apk / ipk / tarball install (no internet on router/AP)
 
-**Option 1 — Install via OpenWrt UI**
 
+### 4. Offline ipk / apk / tarball install (without internet on router/AP)
+
+**Option 1 — Install via OpenWrt UI (24.10.8 only)**
+
+*A .ipk
 Download the latest `luci-app-easymesh_*_all.ipk` from the Releases section if not already downloaded (any device connected to the router via the same IP subnet). Navigate to **System → Software** in OpenWrt's LuCI UI. Click **Upload Package**, select `luci-app-easymesh_*_all.ipk`, and install it.
 
+*B .apk
+Follow `Option 2b`, There is no direct "one-click" way to do this exclusively using the default LuCI software tabs
+
+The LuCI web frontend deliberately prevents untrusted local .apk installations. 
+Because it lacks a backend flag like --allow-untrusted when processing your uploaded files via the System > Software menu, it triggers a signature error and stops the execution.
+
+
 **Option 2 — Install via CLI (SSH / Terminal)**
+Use WinSCP / FileZilla (on PC) or a mobile SFTP manager like Solid Explorer or Documents by Readdle (on smartphone) to copy your downloaded .ipk/.apk package (and any required dependency .ipk/.apk files) into the /tmp folder on the router
+After the files are ready, enter the commands to install them by logging into the router via SSH:
+
+2a OpenWrt ≤ 24.10 (opkg)
+On router
 
 ```sh
-opkg update
-opkg install /path/to/luci-app-easymesh_*_all.ipk
+cd /tmp 
+opkg install luci-app-easymesh-wpad-openssl_2.4.1-r1_all.ipk
+opkg install luci-app-easymesh_2.4.1-r1_all.ipk
+opkg install luci-i18n-easymesh-bn_26.184.37259.7cad107_all.ipk   # optional
+/etc/init.d/uhttpd restart
 ```
+
+2b OpenWrt ≥ 25.12 (apk)
+On router
+
+```sh
+cd /tmp 
+apk add --allow-untrusted ./luci-app-easymesh-wpad-wolfssl-2.4.1-r1.apk
+apk add --allow-untrusted ./luci-app-easymesh-2.4.1-r1.apk
+apk add --allow-untrusted ./luci-i18n-easymesh-bn-26.184.37259.7cad107.apk   # optional
+/etc/init.d/uhttpd restart
+```
+
 
 **Option 3 — Tarball install**
 
-Download on your PC, copy over, extract:
+Download to your PC, Copy or move to the /tmp folder on the router. Extract
 
 ```sh
-# On your PC
+# On PC
 wget https://github.com/arafatrahmanzami/luci-app-easymesh/releases/download/2.4.1-r1/luci-app-easymesh-2.4.1-r1-full.tar.gz
 scp luci-app-easymesh-2.4.1-r1-full.tar.gz root@192.168.1.1:/tmp/
 ```
 
+-Or Copy / Transfer
+
+Using an SFTP manager like option 2, copy or transfer the previously downloaded tar.gz file to the /tmp folder of the router.
+After preparing the file, install it by logging into the router via SSH:
+
+
 ```sh
-# On the router
+# On router
 cd / && tar xzf /tmp/luci-app-easymesh-2.4.1-r1-full.tar.gz
 chmod +x /etc/init.d/easymesh /etc/hotplug.d/iface/30-easymesh-priority /etc/rc.wps/easymesh-pair
 rm -f /tmp/luci-indexcache /tmp/luci-modulecache/*

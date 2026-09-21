@@ -2,7 +2,7 @@
 
 # luci-app-easymesh
 
-OpenWrt/ImmortalWrt-এর জন্য একটি EasyMesh প্লাগইন — একটি হালকা LuCI (OpenWrt-এর ওয়েব-ভিত্তিক কনফিগারেশন ইন্টারফেস) যা 802.11s (IEEE বেতার মেশ মান) বেতার এবং তারযুক্ত ব্যাকহলের সাথে Batman-adv লেয়ার-২ মেশ নেটওয়ার্ক স্থাপনকে সহজ করে। এটি হটস্পট বা VPN (Virtual Private Network) ছাড়াই স্বতন্ত্রভাবে ব্যবহার করা যায়।
+OpenWrt/ImmortalWrt-এর জন্য একটি EasyMesh প্লাগইন — একটি হালকা LuCI (OpenWrt/ImmortalWrt Router-এর ওয়েব/তথ্যপাতা ভিত্তিক  নিয়ন্ত্রণাতল) যা 802.11s (IEEE বেতার মেশ মান) বেতার এবং তারযুক্ত ব্যাকহলের/মূলসংযোগ সাথে Batman-adv/অগ্রবর্তী-জালক  লেয়ার-২ /দ্বিতীয়-স্তর  মেশ নেটওয়ার্ক/জালকবিন্যাস স্থাপনকে সহজ করে। এটি হটস্পট/সংযোগস্থল বা VPN (ছদ্মজাল) ছাড়াই স্বতন্ত্রভাবে ব্যবহার করা যায়।
 
 **প্রকাশ:** `2.4.1-r1` — ২০২৬-০৯-১৬ — [@arafatrahmanzami](https://github.com/arafatrahmanzami) কর্তৃক
 
@@ -158,9 +158,9 @@ apk list --installed 2>/dev/null | grep wpad
 | আপনি যা দেখেন | কী করবেন |
 |---|---|
 | `wpad-mesh-openssl`, `wpad-mesh-wolfssl`, বা `wpad-mesh-mbedtls` | ✅ আপনার কাছে ইতিমধ্যে আছে। **ধাপ ২-এ যান।** |
-| `wpad-openssl`, `wpad-wolfssl`, `wpad-mbedtls` ("mesh" ছাড়া) | ⚠️ একটি মেশ ভেরিয়েন্ট ইনস্টল করুন — ধাপ 1b দেখুন |
-| `wpad-basic`, `wpad-basic-mbedtls`, বা `wpad-mini` | ❌ মেশ করতে পারে না। একটি মেশ ভেরিয়েন্ট ইনস্টল করুন — ধাপ 1b দেখুন |
-| কিছুই না (কোনো wpad নেই) | ❌ একটি মেশ ভেরিয়েন্ট ইনস্টল করুন — ধাপ 1b দেখুন |
+| `wpad-openssl`, `wpad-wolfssl`, `wpad-mbedtls` ("mesh" ছাড়া) | ⚠️ একটি মেশ ভেরিয়েন্ট ইনস্টল করুন — ধাপ ১খ দেখুন |
+| `wpad-basic`, `wpad-basic-mbedtls`, বা `wpad-mini` | ❌ মেশ করতে পারে না। একটি মেশ ভেরিয়েন্ট ইনস্টল করুন — ধাপ ১খ দেখুন |
+| কিছুই না (কোনো wpad নেই) | ❌ একটি মেশ ভেরিয়েন্ট ইনস্টল করুন — ধাপ ১খ দেখুন |
 
 ### ১খ. একটি wpad ভেরিয়েন্ট ইনস্টল করুন (শুধুমাত্র প্রয়োজনে)
 
@@ -281,31 +281,66 @@ cd /tmp && wget https://github.com/arafatrahmanzami/luci-app-easymesh/releases/d
 
 > **ফাইলনাম সম্পর্কে নোট:** GitHub রিলিজ asset নামের `~` কে `.` দিয়ে প্রতিস্থাপন করে। উপরের i18n সংস্করণ স্ট্রিং `.7cad107` ব্যবহার করে — ডাউনলোড URL এই ফর্মটি ব্যবহার করতেই হবে। প্যাকেজ মেটাডেটা (সংস্করণ `26.184.37259~7cad107`) অপরিবর্তিত থাকে।
 
-### ৪. অফলাইন / apk / ipk / tarball ইনস্টল (রাউটারে ইন্টারনেট ছাড়া)
+
+
+### ৪. অফলাইন ipk / apk/ tarball ইনস্টল (রাউটারে ইন্টারনেট ছাড়া)
 
 **বিকল্প ১ — OpenWrt UI-এর মাধ্যমে ইনস্টল করুন**
 
-Releases বিভাগ থেকে সর্বশেষ `luci-app-easymesh_*_all.ipk` ডাউনলোড করুন। OpenWrt-এর LuCI UI-তে **System → Software** এ যান। **Upload Package** ক্লিক করুন, `luci-app-easymesh_*_all.ipk` নির্বাচন করুন, এবং ইনস্টল করুন।
+*ক .ipk
+Releases/প্রকাশ বিভাগ থেকে সর্বশেষ `luci-app-easymesh_*_all.ipk` ডাউনলোড করুন। OpenWrt-এর LuCI UI-তে **System → Software** এ যান। **Upload Package** ক্লিক করুন, `luci-app-easymesh_*_all.ipk` নির্বাচন করুন, এবং ইনস্টল করুন।
+
+*খ .apk 
+`বিকল্প ২খ`  অনুসরণ করুন , শুধুমাত্র ডিফল্ট LuCI সফটওয়্যার ট্যাবগুলো ব্যবহার করে এটি করার কোনো সরাসরি 'এক-ক্লিক' উপায় নেই।
+
+লুসি (LuCI) ওয়েব ফ্রন্টএন্ড উদ্দেশ্যপ্রণোদিতভাবেই অনির্ভরযোগ্য লোকাল .apk ইনস্টলেশন প্রতিরোধ করে। 
+কারণ এর সিস্টেম > সফটওয়্যার (System > Software) মেনুর মাধ্যমে আপনার আপলোড করা ফাইলগুলো প্রসেস করার সময় ব্যাকএন্ডে --allow-untrusted এর মতো কোনো ফ্ল্যাগ বা অনুমতি থাকে না, যার ফলে এটি একটি সিগনেচার ত্রুটি (signature error) দেখায় এবং ইনস্টলেশন প্রক্রিয়াটি বন্ধ করে দেয়।
+
 
 **বিকল্প ২ — CLI (SSH / টার্মিনাল)-এর মাধ্যমে ইনস্টল করুন**
+পিসিতে WinSCP / FileZilla অথবা স্মার্টফোনে Solid Explorer বা Documents by Readdle-এর মতো একটি মোবাইল SFTP ম্যানেজার ব্যবহার করে আপনার ডাউনলোড করা .ipk/.apk প্যাকেজটি (এবং এর জন্য প্রয়োজনীয় অন্যান্য নির্ভরশীল .ipk/ .apk ফাইলগুলো) রাউটারের /tmp ফোল্ডারে কপি বা স্থানান্তর করুন।
+ফাইলগুলো প্রস্তুত করার পর রাউটারে SSH দিয়ে প্রবেশ করে সেগুলো ইনস্টল করার কমান্ড:
+
+২ক OpenWrt ≤ 24.10 (opkg)
+রাউটারে
 
 ```sh
-opkg update
-opkg install /path/to/luci-app-easymesh_*_all.ipk
+cd /tmp 
+opkg install luci-app-easymesh-wpad-openssl_2.4.1-r1_all.ipk
+opkg install luci-app-easymesh_2.4.1-r1_all.ipk
+opkg install luci-i18n-easymesh-bn_26.184.37259.7cad107_all.ipk   # optional
+/etc/init.d/uhttpd restart
+```
+
+২খ OpenWrt ≥ 25.12 (apk)
+রাউটারে
+
+```sh
+cd /tmp 
+apk add --allow-untrusted ./luci-app-easymesh-wpad-wolfssl-2.4.1-r1.apk
+apk add --allow-untrusted ./luci-app-easymesh-2.4.1-r1.apk
+apk add --allow-untrusted ./luci-i18n-easymesh-bn-26.184.37259.7cad107.apk   # optional
+/etc/init.d/uhttpd restart
 ```
 
 **বিকল্প ৩ — Tarball ইনস্টল**
 
-আপনার PC-তে ডাউনলোড করুন, কপি করুন, এক্সট্র্যাক্ট করুন:
+আপনার PC-তে ডাউনলোড করুন, রাউটারের /tmp ফোল্ডারে কপি বা স্থানান্তর করুন।  এক্সট্র্যাক্ট করুন
 
 ```sh
-# আপনার PC-তে
+# PC
 wget https://github.com/arafatrahmanzami/luci-app-easymesh/releases/download/2.4.1-r1/luci-app-easymesh-2.4.1-r1-full.tar.gz
 scp luci-app-easymesh-2.4.1-r1-full.tar.gz root@192.168.1.1:/tmp/
 ```
 
+-অথবা অনুলিপি / স্থানান্তর
+
+বিকল্প ২ এর মতো একটি SFTP ম্যানেজার ব্যবহার করে পূর্বে ডাউনলোড করা tar.gz ফাইল টি, রাউটারের /tmp ফোল্ডারে কপি বা স্থানান্তর করুন।
+ফাইল প্রস্তুত করার পর রাউটারে SSH দিয়ে প্রবেশ করে ইনস্টল করার কমান্ড:
+
+রাউটারে
+
 ```sh
-# রাউটারে
 cd / && tar xzf /tmp/luci-app-easymesh-2.4.1-r1-full.tar.gz
 chmod +x /etc/init.d/easymesh /etc/hotplug.d/iface/30-easymesh-priority /etc/rc.wps/easymesh-pair
 rm -f /tmp/luci-indexcache /tmp/luci-modulecache/*
@@ -313,7 +348,7 @@ rm -f /tmp/luci-indexcache /tmp/luci-modulecache/*
 /etc/init.d/uhttpd restart
 ```
 
-### উৎস কোড
+### উৎস কোড  (ক্রমানুদেশন)
 
 - [`.zip` ডাউনলোড করুন](https://github.com/arafatrahmanzami/luci-app-easymesh/archive/refs/tags/2.4.1-r1.zip)
 - [`.tar.gz` ডাউনলোড করুন](https://github.com/arafatrahmanzami/luci-app-easymesh/archive/refs/tags/2.4.1-r1.tar.gz)
@@ -350,7 +385,7 @@ rm -f /tmp/luci-indexcache /tmp/luci-modulecache/*
 2. **ক্লায়েন্ট** (এক্সটেন্ডার): role: **Client**, একই **Mesh ID**, **AP Mode: ON**, static IP
 3. **উভয়ে**: একই পাসওয়ার্ড, **K/V/R** চালু
 
-**দ্রুত সেটআপ প্রিসেট** — একটি ভূমিকা বাছাই করুন, একটি বোতাম ক্লিক করুন, সম্পন্ন:
+**দ্রুত সেটআপ পূর্বনির্ধারিত** — একটি ভূমিকা বাছাই করুন, একটি বোতাম ক্লিক করুন, সম্পন্ন:
 
 ![Quick Setup presets 1-9](../screenshots-bn/02-quick-setup-1-9_bn.png)
 
@@ -365,7 +400,7 @@ rm -f /tmp/luci-indexcache /tmp/luci-modulecache/*
 <a id="detailed-setup-anchor"></a>
 ## বিস্তারিত সেটআপ — মৌলিক মেশ নেটওয়ার্ক (১ সার্ভার + ২ নোড)
 
-### ধাপ ১ — মেশ সার্ভার সেটআপ করুন
+### ধাপ ১ — জালক সার্ভার সেটআপ করুন
 
 1. OpenWrt-এ (**Network → Wireless**) যেকোনো সক্রিয় বেতার নেটওয়ার্ক নিষ্ক্রিয়/মুছুন।
 2. **Network → EasyMesh**-এ যান এবং Mesh Mode-এর জন্য **"Server"** নির্বাচন করুন।
@@ -1098,7 +1133,7 @@ make package/luci-app-easymesh/compile V=s
 | **phy0, phy1** | বেতার রেডিও হার্ডওয়্যার সনাক্তকারী। |
 | **radio0, radio1** | OpenWrt-এ রেডিওর নাম। |
 | **bat0** | Batman-adv-এর ভার্চুয়াল মেশ ইন্টারফেস। |
-| **br-lan** | LAN ব্রিজ ইন্টারফেস — একাধিক পোর্টকে একটি নেটওয়ার্কে একত্রিত করে। |
+| **br-lan** | LAN ব্রিজ ইন্টারফেস (সেতুবন্ধন)— একাধিক পোর্টকে একটি নেটওয়ার্কে একত্রিত করে। |
 | **br-guest** | অতিথি নেটওয়ার্কের ব্রিজ। |
 | **wlan0, wlan1** | বেতার ক্লায়েন্ট/AP ইন্টারফেস। |
 
@@ -1117,18 +1152,22 @@ make package/luci-app-easymesh/compile V=s
 | **Preset** | পূর্বনির্ধারিত সেটিংস — এক ক্লিকে সাধারণ কনফিগারেশন। |
 | **Rollback** | পরিবর্তনের পর সমস্যা হলে পূর্বের অবস্থায় ফিরে যাওয়া। |
 | **Watchdog** | নির্দিষ্ট সময়ে নির্দিষ্ট কাজ সম্পাদনকারী নজরদারি প্রক্রিয়া। |
+| **WiFi** |বেতার (তারহীন-সংযোগ) । |
+
 
 ### প্ল্যাটফর্ম
 
 | পরিভাষা | ব্যাখ্যা |
 |---|---|
+
+| **Branch** | কোডের একটি সমান্তরাল সংস্করণ। |
+| **Commit** | কোড পরিবর্তনের একটি সংরক্ষিত স্ন্যাপশট। |
+| **Fork** | অন্য কারও প্রকল্পের নিজস্ব অনুলিপি, স্বাধীনভাবে পরিবর্তনযোগ্য। |
 | **Git** | ভার্সন নিয়ন্ত্রণ ব্যবস্থা — কোডের পরিবর্তন ট্র্যাক করে। |
 | **GitHub** | Git রিপোজিটরি হোস্টিং প্ল্যাটফর্ম। কোড শেয়ার ও সহযোগিতার জন্য। |
 | **Repository (Repo)** | কোড ও ফাইলের সংগ্রহস্থল। |
-| **Commit** | কোড পরিবর্তনের একটি সংরক্ষিত স্ন্যাপশট। |
-| **Branch** | কোডের একটি সমান্তরাল সংস্করণ। |
-| **Fork** | অন্য কারও প্রকল্পের নিজস্ব অনুলিপি, স্বাধীনভাবে পরিবর্তনযোগ্য। |
 | **Release** | একটি নির্দিষ্ট সংস্করণ যা ব্যবহারকারীদের জন্য প্রকাশ করা হয়। |
+| **Source code** | উৎস কোড (প্রোগ্রামিং নির্দেশনাবলী) — সহজভাবে ক্রমানুদেশন (নির্দিষ্ট ক্রমে নির্দেশ দেওয়া) |
 | **Tag** | একটি কমিটের নামসহ চিহ্ন (যেমন `2.4.1-r1`)। |
 | **Linux** | ওপেন-সোর্স অপারেটিং সিস্টেম কার্নেল — OpenWrt ও ImmortalWrt এর ভিত্তি। |
 
