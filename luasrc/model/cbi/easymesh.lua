@@ -89,23 +89,6 @@ local function human_rate(bps)
     else return string.format("%.2f GB/s", bps / 1073741824) end
 end
 
-local function batman_ping(mac)
-    if not mac or mac == "" then return "—" end
-    local fp = io.popen("batctl ping -c 3 -i 0.2 -t 1 " .. mac .. " 2>/dev/null")
-    if not fp then return "—" end
-    local min_ms = nil
-    for line in fp:lines() do
-        local t = line:match("time=([%d%.]+)")
-        if t then
-            local ms = tonumber(t)
-            if ms and (not min_ms or ms < min_ms) then min_ms = ms end
-        end
-    end
-    fp:close()
-    if not min_ms then return "—" end
-    return string.format("%.1f ms", min_ms)
-end
-
 local function read_override(iface)
     -- Try multiple batctl syntaxes — first one that returns a digit wins
     local cmds = {
@@ -124,6 +107,40 @@ local function read_override(iface)
         end
     end
     return "?"
+end
+
+local function batman_ping(mac)
+    if not mac or mac == "" or mac == "—" then return "—" end
+
+    -- 30-second cache — page reloads within that window are instant
+    local cachepath = "/tmp/easymesh-ping-" .. mac:gsub(":", "")
+    local f = io.open(cachepath, "r")
+    if f then
+        local ts  = tonumber(f:read("*l") or "0")
+        local val = f:read("*l") or "—"
+        f:close()
+        if ts and (os.time() - ts) < 30 then
+            return val
+        end
+    end
+
+    local fp = io.popen("batctl ping -c 2 -i 0.2 -t 1 " .. mac .. " 2>/dev/null")
+    if not fp then return "—" end
+    local min_ms = nil
+    for line in fp:lines() do
+        local t = line:match("time=([%d%.]+)")
+        if t then
+            local ms = tonumber(t)
+            if ms and (not min_ms or ms < min_ms) then min_ms = ms end
+        end
+    end
+    fp:close()
+    local result = min_ms and string.format("%.1f ms", min_ms) or "—"
+
+    local w = io.open(cachepath, "w")
+    if w then w:write(os.time(), "\n", result, "\n"); w:close() end
+
+    return result
 end
 
 -- =========================================================
@@ -220,7 +237,13 @@ end
 
 local peers = detect_nodes()
 for _, p in ipairs(peers) do
-    p.Latency  = batman_ping(p.Neighbor)
+    -- Skip ping if lastseen > 30s → no timeout cost for stale entries
+    local ls = tonumber((p.lastseen or ""):match("([%d%.]+)") or "9999")
+    if ls and ls < 30 then
+        p.Latency = batman_ping(p.Neighbor)
+    else
+        p.Latency = translate("stale")
+    end
     p.Priority = read_override(p.IF)
     local r = rates[p.IF]
     if r then p.BW_RX = r.rx; p.BW_TX = r.tx
