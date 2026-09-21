@@ -2,7 +2,7 @@
 
 # luci-app-easymesh
 
-An EasyMesh plugin for OpenWrt/ImmortalWrt — a lightweight LuCI (OpenWrt's web-based configuration UI) interface that simplifies deploying Batman-adv layer-2 mesh networks with 802.11s (IEEE WiFi mesh standard) wireless and wired backhaul. It can also be used standalone without a hotspot or VPN (Virtual Private Network).
+An EasyMesh plugin for OpenWrt/ImmortalWrt — a lightweight Linux LuCI (OpenWrt's web-based configuration User Interface) interface that simplifies deploying Batman-adv layer-2 mesh networks with 802.11s (IEEE WiFi mesh standard) wireless and wired backhaul. It can also be used standalone without a hotspot or VPN (Virtual Private Network).
 
 **Release:** `2.4.1-r1` — 2026-09-16 — by [@arafatrahmanzami](https://github.com/arafatrahmanzami)
 
@@ -1023,7 +1023,7 @@ Terms used in this README that may be unfamiliar, especially if you're new to Op
 |---|---|
 | **OpenWrt** | Open-source router firmware, Linux-based. Gives full control over the router. |
 | **ImmortalWrt** | A fork of OpenWrt maintained by the Chinese community, with some extra packages and default settings. |
-| **LuCI** | OpenWrt's web-based configuration interface — what opens when you visit `http://<router-ip>` in a browser. |
+| **LuCI** | OpenWrt's web-based configuration interface / Lua Configuration Interface (or sometimes Lua Control Interface) — what opens when you visit `http://<router-ip>` in a browser. |
 | **UCI** | Unified Configuration Interface — OpenWrt's system for storing all configuration in one place, under `/etc/config/`. |
 | **opkg** | Package manager used by OpenWrt 24.10 and older. Installs `.ipk` files. |
 | **apk** | Newer package manager used by OpenWrt 25.12+ and Alpine Linux. Installs `.apk` files. |
