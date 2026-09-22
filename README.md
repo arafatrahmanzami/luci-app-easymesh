@@ -305,10 +305,12 @@ After the files are ready, enter the commands to install them by logging into th
 On router
 
 ```sh
-cd /tmp 
+```sh
+cd /tmp
 opkg install luci-app-easymesh-wpad-openssl_2.4.1-r1_all.ipk
 opkg install luci-app-easymesh_2.4.1-r1_all.ipk
-opkg install luci-i18n-easymesh-bn_26.184.37259.7cad107_all.ipk   # optional
+# optional
+opkg install luci-i18n-easymesh-bn_26.184.37259.7cad107_all.ipk
 /etc/init.d/uhttpd restart
 ```
 
@@ -316,10 +318,11 @@ opkg install luci-i18n-easymesh-bn_26.184.37259.7cad107_all.ipk   # optional
 On router
 
 ```sh
-cd /tmp 
-apk add --allow-untrusted ./luci-app-easymesh-wpad-wolfssl-2.4.1-r1.apk
-apk add --allow-untrusted ./luci-app-easymesh-2.4.1-r1.apk
-apk add --allow-untrusted ./luci-i18n-easymesh-bn-26.184.37259.7cad107.apk   # optional
+cd /tmp
+apk --allow-untrusted add /tmp/luci-app-easymesh-wpad-wolfssl-2.4.1-r1.apk
+apk --allow-untrusted add /tmp/luci-app-easymesh-2.4.1-r1.apk
+# optional
+apk --allow-untrusted add /tmp/luci-i18n-easymesh-bn-26.184.37259.7cad107.apk
 /etc/init.d/uhttpd restart
 ```
 
