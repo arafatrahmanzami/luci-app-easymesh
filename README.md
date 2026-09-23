@@ -305,7 +305,6 @@ After the files are ready, enter the commands to install them by logging into th
 On router
 
 ```sh
-```sh
 cd /tmp
 opkg install luci-app-easymesh-wpad-openssl_2.4.1-r1_all.ipk
 opkg install luci-app-easymesh_2.4.1-r1_all.ipk
