@@ -305,10 +305,12 @@ Releases/প্রকাশ বিভাগ থেকে সর্বশেষ `
 রাউটারে
 
 ```sh
-cd /tmp 
+```sh
+cd /tmp
 opkg install luci-app-easymesh-wpad-openssl_2.4.1-r1_all.ipk
 opkg install luci-app-easymesh_2.4.1-r1_all.ipk
-opkg install luci-i18n-easymesh-bn_26.184.37259.7cad107_all.ipk   # optional
+# optional
+opkg install luci-i18n-easymesh-bn_26.184.37259.7cad107_all.ipk
 /etc/init.d/uhttpd restart
 ```
 
@@ -316,10 +318,11 @@ opkg install luci-i18n-easymesh-bn_26.184.37259.7cad107_all.ipk   # optional
 রাউটারে
 
 ```sh
-cd /tmp 
-apk add --allow-untrusted ./luci-app-easymesh-wpad-wolfssl-2.4.1-r1.apk
-apk add --allow-untrusted ./luci-app-easymesh-2.4.1-r1.apk
-apk add --allow-untrusted ./luci-i18n-easymesh-bn-26.184.37259.7cad107.apk   # optional
+cd /tmp
+apk --allow-untrusted add /tmp/luci-app-easymesh-wpad-wolfssl-2.4.1-r1.apk
+apk --allow-untrusted add /tmp/luci-app-easymesh-2.4.1-r1.apk
+# optional
+apk --allow-untrusted add /tmp/luci-i18n-easymesh-bn-26.184.37259.7cad107.apk
 /etc/init.d/uhttpd restart
 ```
 
@@ -328,7 +331,7 @@ apk add --allow-untrusted ./luci-i18n-easymesh-bn-26.184.37259.7cad107.apk   # o
 আপনার PC-তে ডাউনলোড করুন, রাউটারের /tmp ফোল্ডারে কপি বা স্থানান্তর করুন।  এক্সট্র্যাক্ট করুন
 
 ```sh
-# PC
+# On PC
 wget https://github.com/arafatrahmanzami/luci-app-easymesh/releases/download/2.4.1-r1/luci-app-easymesh-2.4.1-r1-full.tar.gz
 scp luci-app-easymesh-2.4.1-r1-full.tar.gz root@192.168.1.1:/tmp/
 ```
@@ -341,6 +344,7 @@ scp luci-app-easymesh-2.4.1-r1-full.tar.gz root@192.168.1.1:/tmp/
 রাউটারে
 
 ```sh
+# On router
 cd / && tar xzf /tmp/luci-app-easymesh-2.4.1-r1-full.tar.gz
 chmod +x /etc/init.d/easymesh /etc/hotplug.d/iface/30-easymesh-priority /etc/rc.wps/easymesh-pair
 rm -f /tmp/luci-indexcache /tmp/luci-modulecache/*
